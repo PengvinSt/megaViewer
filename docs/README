@@ -1,0 +1,73 @@
+-------------------------{Folder tree}-------------------------
+
+./app/electron for electron main files (like @fs)
+./app/electron/main.js enterpoint of application
+./app/electron/resources for resources like img etc.
+
+./app/src for front-end of app
+./docs for data purposes
+
+
+Webpack has a concept of an entry point, which is where Webpack starts looking for dependencies that it then bundles together.
+ Our entry point of our Electron application is the index.jsx file that we just created. Let's configure our entry point in our Webpack config file.
+-------------------------{npm package}-------------------------
+
+Electron (main builder lib for desctop app) || npm i electron -dev
+npm i react react-dom
+
+npm i webpack webpack-cli --save-dev  
+
+{Webpack is a static module bundler }
+
+npm i babel-loader --save-dev
+
+{By default, Webpack does not support .jsx, so we need to make use of a loader that has the ability to load [and process] .jsx files. 
+The loader we will be using is babel-loader.  Install this by running the command below.}
+
+npm i @babel/core @babel/preset-env @babel/preset-react
+
+{Unfortunately, babel-loader by itself won't actually transpile .jsx files to .js files. For the actual transpiling we will need @babel/core and a few presets. 
+Install the additional dependencies to our growing list of devDependencies.}
+
+npm i html-loader --save-dev
+
+{Bundling React doesn't actually change our application, we are still loading our Hello world page if we run electron .. 
+In order for our React code to be injected into our HTML page, we need to add a Webpack loader for .html files. Install html-loader with the below command.}
+
+npm i html-webpack-plugin --save-dev
+
+{In a similar situation like babel-loader, the existence of html-loader in our webpack configuration file only gets us half-way. 
+In our application, we not only need to load our .html file, but we need our transpiled Javascript to be included in the .html file. 
+Webpack itself is unable to support this scenario, but a Webpack plugin can;  html-webpack-plugin. Install this with the below command.}
+
+npm i style-loader css-loader --save-dev
+
+{Webpack, by default, does not know how to process CSS files. In order to inject this CSS into our webpage, we need an additional two loaders configured in our Webpack config;
+ style-loader and css-loader. Install both of them by running npm i style-loader css-loader --save-dev.}
+
+ npm i webpack-dev-server --save-dev
+
+ {
+  The Webpack dev server works by hosting a local webserver where we can point our application to use; the bundled files 
+  Webpack creates will be updated on the fly when changes are made.
+ }
+
+ npm i webpack-merge --save-dev
+ {There exists a package named webpack-merge that will enable us to support Webpack in the development and production environments.
+  Using this package will allow us to define a base configuration file, and environment specific files for development and production.}
+
+  npm i cross-env --save-dev
+  {env variables}
+  npm i electron-builder --save-dev
+  {for build apps in packages}
+-------------------------{scripts}-----------------------------
+
+npm run dev-server || start the dev server
+npm run dev || start the application(dev)
+npm run preprod || webpack bundle for prod
+npm run prod || run the application(prod)
+npm run postinstall ||
+npm run pack ||
+npm run dist || create a distributable for your application.
+
+________________________________________________________________

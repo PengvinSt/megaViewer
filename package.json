@@ -1,0 +1,64 @@
+{
+  "name": "indev-desctop-filemanager",
+  "version": "0.0.1",
+  "description": "Extended file manager",
+  "private": true,
+  "main": "app/electron/main.js",
+  "scripts": {
+    "dev-server": "webpack serve --mode development --config ./webpack.development.js",
+    "dev": "cross-env NODE_ENV=development electron .",
+    "preprod": "webpack --mode production --config ./webpack.production.js",
+    "prod": "cross-env NODE_ENV=production electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist-mac": "electron-builder --mac",
+    "dist-linux": "electron-builder --linux",
+    "dist-windows": "electron-builder --windows"
+  },
+  "build": {
+    "productName": "ExFileManager",
+    "appId": "com.pengvinstcomp.exfilemanager",
+    "directories": {
+        "buildResources": "./app/electron/resources"
+    },
+    "win": {
+        "target": [
+            "nsis",
+            "msi"
+        ]
+    },
+    "linux": {
+        "target": [
+            "deb",
+            "rpm",
+            "snap",
+            "AppImage"
+        ]
+    }
+  },
+  "keywords": [],
+  "author": "PengvinSt",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-loader": "^9.1.3",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.8.1",
+    "electron": "^25.3.2",
+    "electron-builder": "^24.6.3",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.3",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-merge": "^5.9.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
+    "@babel/preset-react": "^7.22.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
