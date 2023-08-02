@@ -1,5 +1,8 @@
-const { app,screen, BrowserWindow, Menu, Tray } = require('electron') 
+const { app,screen, BrowserWindow, Menu, ipcMain, fs } = require('electron'); 
+const { readdir, readdirSync } = require('fs');
 const path = require('path')
+
+
 
 const lock = app.requestSingleInstanceLock()
 
@@ -13,22 +16,41 @@ if(!lock){
     })
 }
 
+ipcMain.handle('getCurrentFilePath', ()=>{
+    const path = app.getAppPath()
+    return path
+})
+
+ipcMain.handle('getFilesFromPath', (_, path)=>{
+    let results = readdirSync(path,{withFileTypes: true})
+    return results.map(file => ({
+        name: file.name,
+        type: file.isDirectory() ? "Folder" : "File",
+    }))
+})
+
+
+
+
 const createMainWindow = () =>{
-    const {width, height} = screen.getPrimaryDisplay().workAreaSize
+    const {width, height} = screen.getPrimaryDisplay().size
 
     let window = new BrowserWindow({
-        backgroundColor:'#f1c40f',
+        backgroundColor:"#1C2321",
         width: 800,
-        height: 500,
-        minWidth:400,
-        minHeight:400,
+        height: 600,
+        minWidth:600,
+        minHeight:600,
         maxHeight:height,
         maxWidth:width,
         show:false,
+        thickFrame:true,
         webPreferences: {
-        worldSafeExecuteJavaScript: true,
+            worldSafeExecuteJavaScript: true,
+            preload: path.join(__dirname, 'preload.js')
         }
     })
+    
     
     window.webContents.on('did-finish-load', ()=>{
         window.show()
@@ -43,7 +65,7 @@ const createMainWindow = () =>{
     }
     
     if (isDevelopment) {
-        window.loadURL("http://localhost:40992");
+        window.loadURL("http://localhost:3000");
     } else {
         window.loadFile("app/dist/index.html");
     }

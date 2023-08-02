@@ -34,7 +34,14 @@ module.exports = {
                     "style-loader",
                     "css-loader"
                 ]
-            }
+            },
+            {
+                test: /\.(svg|png|jpg|gif)$/,
+                include: [
+                  path.resolve(__dirname, "resources/images")
+                ],
+                type: "asset/inline"
+            },
         ]
     },
     plugins: [

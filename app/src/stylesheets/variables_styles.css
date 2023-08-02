@@ -1,0 +1,22 @@
+/* welcomePage vars  */
+:root {
+    /*colors*/
+
+    --welcomePage-background-color:#1C2321;
+    --welcomePage-main-font-color:#7D98A1;
+
+    /* https://coolors.co/1c2321-7d98a1-5e6572-a9b4c2-eef1ef */
+    --some-random-color-1:#5E6572;
+    --some-random-color-2:#A9B4C2;
+    --some-random-color-3:#EEF1EF;
+
+    /*etc*/
+
+    --welcomePage-medium-font-size:16px;
+    --welcomePage-font-family:'Courier New', Courier, monospace;
+}
+/* Offline explorer vars */
+:root {
+    --offlineExplorer-main-background-color:#23262e;
+    --offlineExplorer-main-font-color: #FFFFFF;
+}

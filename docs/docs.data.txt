@@ -71,3 +71,5 @@ npm run pack ||
 npm run dist || create a distributable for your application.
 
 ________________________________________________________________
+npm i
+npm run dev

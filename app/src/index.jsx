@@ -1,9 +1,10 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
-import "./index.css";
+import "./stylesheets/main_styles.css";
+import "./stylesheets/variables_styles.css"
+import App from "./components/App";
 
-const container = document.getElementById("root");
-const root = createRoot(container);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-root.render(<React.Fragment>Hello world from React? :)</React.Fragment>);
+root.render(<App/>);
