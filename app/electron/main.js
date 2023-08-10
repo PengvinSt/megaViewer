@@ -1,12 +1,12 @@
-const { app,screen, BrowserWindow, Menu, ipcMain, fs } = require('electron'); 
+const { app,screen, BrowserWindow, Menu, ipcMain } = require('electron'); 
 const { readdir, readdirSync } = require('fs');
 const path = require('path')
-
-
-
+const checkDiskSpace = require('check-disk-space').default
 const lock = app.requestSingleInstanceLock()
-
 const isDevelopment = process.env.NODE_ENV === "development";
+const drivelist = require('drivelist');
+
+const fs = require("fs")
 
 if(!lock){
     app.quit()
@@ -15,21 +15,52 @@ if(!lock){
     app.focus()
     })
 }
-
+// deprecated --------------------------------
 ipcMain.handle('getCurrentFilePath', ()=>{
     const path = app.getAppPath()
     return path
 })
+// deprecated --------------------------------
 
-ipcMain.handle('getFilesFromPath', (_, path)=>{
-    let results = readdirSync(path,{withFileTypes: true})
-    return results.map(file => ({
-        name: file.name,
-        type: file.isDirectory() ? "Folder" : "File",
-    }))
+ipcMain.handle('getStartingPath', async ()=>{
+    const drives = await drivelist.list();
+    return drives
 })
 
+const getFileStats = async (path) => {
+    try {
+        const stats = await fs.promises.stat(path);
+        return stats
+    } catch (error) {
+        console.log(error)
+    }
+}
 
+ipcMain.handle('getFilesFromPath', async (_, path)=>{
+    const fixedPath = `${path}\\`
+    let rawData = readdirSync(fixedPath,{withFileTypes: true})
+    const results = await Promise.all(rawData.map(async (file) =>{
+        const Stats = await getFileStats(fixedPath + file.name)
+        return {
+            name: file.name,
+            type: file.isDirectory() ? "Folder" : "File",
+            Stats
+        }
+    }))
+    return results
+})
+
+ipcMain.handle('getDiskSpace', async (_, path)=>{
+    if (process.platform == 'win32') { // Run wmic for Windows.
+        const diskInfo = await checkDiskSpace(path)
+        return diskInfo
+
+    } else if (process.platform == 'linux') { // Run df for Linux.
+        // in development
+    } else {
+        // in development
+    }
+})
 
 
 const createMainWindow = () =>{
@@ -39,7 +70,7 @@ const createMainWindow = () =>{
         backgroundColor:"#1C2321",
         width: 800,
         height: 600,
-        minWidth:600,
+        minWidth:720,
         minHeight:600,
         maxHeight:height,
         maxWidth:width,

@@ -17,6 +17,19 @@
 }
 /* Offline explorer vars */
 :root {
-    --offlineExplorer-main-background-color:#23262e;
+    --offlineExplorer-main-background-color:#191919;
     --offlineExplorer-main-font-color: #FFFFFF;
+    --offlineExplorer-file-hover-background-color: #2c2c2c;
+
+    --offlineExplorer-drive-background-color: #202020;
+    --offlineExplorer-drive-hover-background-color:#363636;
+
+    --disk-fill-indicator-filled:#4e9de5;
+    --disk-fill-indicator-empty:#2b5278;
+    --disk-fill-indicator-alert:#e71426;
+
+    --offlineExplorer-drive-background-color-skeleton-start:#191919;
+    --offlineExplorer-drive-background-color-skeleton-end:#222020;
+
+    --offlineExplorer-file-info-down-display-line-color:black;
 }
