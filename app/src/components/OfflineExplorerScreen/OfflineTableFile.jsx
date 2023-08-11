@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Folder from 'Images/empty_folder.png'
+import Folder from 'Images/folder.png'
 import BlankFile from 'Images/blank_file.png'
 
 export default function OfflineTableFile({file,goToNextFolder, date_c, date_m}) {

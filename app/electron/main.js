@@ -85,7 +85,7 @@ const createMainWindow = () =>{
     
     window.webContents.on('did-finish-load', ()=>{
         window.show()
-        window.focus()
+        // window.focus()
     })
 
     if(isDevelopment){

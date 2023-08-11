@@ -4,7 +4,21 @@ import dividerArrow from 'Images/divider_arrow.png'
 
 import OfflineTableFile from './OfflineTableFile'
 import OfflineDisk from './OfflineDisk'
+import hardDiskImg from 'Images/hard_disk.png'
+import SystemDiskImg from 'Images/systemDisk.png'
+
 import { Scrollbar } from 'react-scrollbars-custom';
+import Folder from 'Images/folder.png'
+import PC from 'Images/pc_icon.png'
+import View from 'Images/view_button.svg'
+import Sorting from 'Images/sorting_button.svg'
+import Share from 'Images/share_button.svg'
+import Property from 'Images/property_button.svg'
+
+import Reload from 'Images/reload.svg'
+import LeftArrow from 'Images/left_arrow.svg'
+import RightArrow from 'Images/right_arrow.svg'
+import UpArrow from 'Images/up_arrow.svg'
 
 
 export default function FolderContentField() {
@@ -13,12 +27,15 @@ export default function FolderContentField() {
     const [directory, setDirectory] = useState('')
     const [coreDir, setCoreDir] = useState([])
     const [drives, setDrives] = useState([])
+    const [prevDirectory, setPrevDirectory] = useState('')
+    const [nextDirectory, setNextDirectory] = useState('')
 
     const goToNextFolder = async (file) =>{
         try {
             if(file.type === 'Folder'){
                 const resFiles = await window.api.getFilesFromPath(`${directory}\\${file.name}`)
                 setFiles([...resFiles])
+                setPrevDirectory(directory)
                 setDirectory(`${directory}\\${file.name}`)
             }else {
                 throw new Error({message:'Not a folder'})
@@ -30,7 +47,9 @@ export default function FolderContentField() {
     
     const goToPrevFolder = async (path) => {
         try {
+            console.log(path, directory)
             const resFiles = await window.api.getFilesFromPath(getPrevDirectory(directory,path))
+            setNextDirectory(directory)
             setDirectory(getPrevDirectory(directory,path))
             setFiles([...resFiles])
             // console.log(JSON.stringify(resFiles))
@@ -41,8 +60,54 @@ export default function FolderContentField() {
     }
     const getPrevDirectory = (dir, folder) => {
         return dir.slice(0, dir.indexOf(folder)) + folder
-     }
+    }
     
+    const upArrowFunc = () => {
+        if(directory.length !== 0){
+            if(directory.length > 4){
+                if(directory.split('\\').filter(data=> data).length > 2){
+                    goToPrevFolder(directory.split('\\').slice(-2)[0])
+                }else {
+                    goToDisk(directory.split('\\')[0])
+                }
+            }else {
+                getStartingPath()
+            }
+        }
+    }
+
+    const reloadFunc = async () => {
+        if(directory.length > 1){
+            const resFiles = await window.api.getFilesFromPath(directory)
+            setFiles([...resFiles])
+        }else {
+            location.reload()
+        }
+    }
+
+    const prevDirectoryArrowFunc = async () => {
+        
+        if(prevDirectory.length > 0){
+            setCoreDir([])
+            const resFiles = await window.api.getFilesFromPath(prevDirectory)
+            setFiles([...resFiles])
+            setNextDirectory(directory)
+            setDirectory(prevDirectory)
+            setPrevDirectory('')
+        }
+    }
+
+    const nextDirectoryArrowFunc = async ()=> {
+        if(nextDirectory.length > 0){
+            setCoreDir([])
+            const resFiles = await window.api.getFilesFromPath(nextDirectory)
+            setFiles([...resFiles])
+            setPrevDirectory(directory)
+            setDirectory(nextDirectory)
+            setNextDirectory('')
+        }
+    }
+
     const getStartingPath = async() =>{
         try {
             const drive = await window.api.getStartingPath()
@@ -83,48 +148,73 @@ export default function FolderContentField() {
     <div className="folder_content_and_properties_container">
         <div className="properties_container">
         <div className='nav_buttons_container'>
-            <button onClick={()=>{goToPrevFolder(directory)}}>back</button>
-            <button>next</button>
-            <button>reload</button>
-            <button>Go to</button>
+            <button onClick={()=>{prevDirectoryArrowFunc()}} style={{background:prevDirectory.length === 0 && 'background:var(--offlineExplorer-main-background-color)'}}><img src={LeftArrow} alt="nav arrow" style={{ filter: prevDirectory.length === 0 && 'var(--offlineExplorer-not-interractive-svg)'}}/></button>
+            <button onClick={()=>{nextDirectoryArrowFunc()}} style={{background:nextDirectory.length === 0 && 'background:var(--offlineExplorer-main-background-color)'}}><img src={RightArrow} alt="nav arrow" style={{ filter: nextDirectory.length === 0 && 'var(--offlineExplorer-not-interractive-svg)'}}/></button>
+            <button onClick={()=>{upArrowFunc()}} style={{background:directory.length === 0 && 'background:var(--offlineExplorer-main-background-color)'}}><img src={UpArrow} alt="nav arrow" style={{ filter: directory.length === 0 && 'var(--offlineExplorer-not-interractive-svg)'}}/></button>
+            <button onClick={()=>{reloadFunc()}}><img src={Reload} alt="nav arrow"/></button>
         </div>
         <div className='info_and_properties_container'>
             <div className='path_container'>
-            {directory.split('\\').length < 4 && <p onClick={()=> getStartingPath()}>This PC</p>}
-            {directory.split('\\').length < 4 
-            ?directory.split('\\').map((path, i)=>
-                path.at(-1) === ':' 
-                ? <p onClick={()=>goToDisk(path)}><img src={dividerArrow} alt="divide_arrow" />{path.slice(0, -1)}</p>
-                : path.length !== 0 &&
-                    <p onClick={()=>goToPrevFolder(path)}>
-                        <img src={dividerArrow} alt="divide_arrow" />
-                        {i+1 === directory.split('\\').length 
-                        ? path.length > 15 ? path.slice(0,5)+`...` : path
-                        : path.length > 6 ? path.slice(0,5)+`...` : path
-                        }
-                    </p>
-                )
-                :<>
-                <p onClick={()=>goToDisk(directory.split('\\')[0])}>{directory.split('\\')[0].slice(0, -1)}</p>
-                <p><img src={dividerArrow} alt="divide_arrow" />...</p>
-                {directory.split('\\').slice(-2).map((path , i) =>
-                    <p onClick={()=> goToPrevFolder(path)}>
-                        <img src={dividerArrow} alt="divide_arrow" />
-                        {/* {i === 1
-                        ? path
-                        : path.length > 6 ? path.slice(0,5)+`...` : path
-                        } */}
-                        {path.length > 6 ? path.slice(0,5)+`...` : path}
-                    </p>
-                    )}
-                </>
+                {directory.length < 4
+                    ? directory.length === 0 ? <img src={PC} alt="System representation" className='folder_representation'/> : <img src={(directory === 'C:\\\\' || directory === 'C:\\' || directory === 'C:') ? SystemDiskImg : hardDiskImg} alt="Disk representation" className='folder_representation'/>
+                    :<img src={Folder} alt="Folder representation" className='folder_representation'/>
                 }
+                <div className='intaractive_path'>
+                    {directory.length < 4
+                    ? <div className='start_path_container'>
+                        <p className={directory.length !== 0 && 'this_pc'} onClick={()=> getStartingPath()}>This PC</p> 
+                        {directory.length !== 0 && 
+                        <>
+                        <img src={dividerArrow} alt="divide_arrow" />
+                        <p>Local Disk {directory.length === 2 ? directory.slice(0,-1): directory.slice(0,-2)}</p>
+                        </>
+                        }
+                      </div>
+                    : <>
+                        <h1>{directory.split('\\').slice(-1)[0].length > 25 ? directory.split('\\').slice(-1)[0].slice(0,10)+`...` : directory.split('\\').slice(-1)[0]}</h1>
+                        <div className='intaractive_path_inner_div'>
+                        {directory.split('\\').length < 4 
+                            ? directory.split('\\').map((path, i)=>
+                                path.at(-1) === ':' 
+                                ? <p onClick={()=>{setNextDirectory(directory);goToDisk(path)}}>{path.slice(0, -1)}</p>
+                                    : path.length !== 0 &&
+                                        <p onClick={()=>goToPrevFolder(path)}>
+                                            <img src={dividerArrow} alt="divide_arrow" />
+                                            {i+1 === directory.split('\\').length 
+                                            ? path.length > 25 ? path.slice(0,10)+`...` : path
+                                            : path.length > 10 ? path.slice(0,5)+`...` : path
+                                            }
+                                        </p>)
+                            :<>
+                                <p onClick={()=>{setNextDirectory(directory);goToDisk(directory.split('\\')[0])}}>{directory.split('\\')[0].slice(0, -1)}</p>
+                                <p><img src={dividerArrow} alt="divide_arrow" />...</p>
+                                {directory.split('\\').slice(-2).map((path , i) =>
+                                    <p onClick={()=> goToPrevFolder(path)}>
+                                        <img src={dividerArrow} alt="divide_arrow" />
+                                        {i+3 === directory.split('\\').length 
+                                            ? path.length > 25 ? path.slice(0,10)+`...` : path
+                                            : path.length > 10 ? path.slice(0,5)+`...` : path
+                                        }
+                                    </p>
+                                )}
+                            </>
+                        }
+                        </div>
+                    </>
+                    }
+                    
+                </div>
             </div>
             <div className='properties_buttons'>
-                <button>view</button>
-                <button>sorting</button>
-                <button>Share</button>
-                <button>Properties</button>
+                <div className='properties_buttons_visible'>
+                    <button><img src={View} alt="view image" /> view</button>
+                    <button><img src={Sorting} alt="sorting image" /> sorting</button>
+                    <button><img src={Share} alt="share image" /> Share</button>
+                    <button><img src={Property} alt="property image" /> Properties</button>
+                </div>
+                <div className='properties_buttons_hiden'>
+                    f off
+                </div>
             </div>
         </div>
         </div> 

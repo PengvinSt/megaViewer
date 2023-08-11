@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
 import hardDiskImg from 'Images/hard_disk.png'
-import SsdImg from 'Images/ssd.png'
 import SystemDiskImg from 'Images/systemDisk.png'
 import FillBar from './FillBar'
 

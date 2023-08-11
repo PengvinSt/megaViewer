@@ -21,6 +21,14 @@
     --offlineExplorer-main-font-color: #FFFFFF;
     --offlineExplorer-file-hover-background-color: #2c2c2c;
 
+    --offlineExplorer-main-button-background-color:#494a4b;
+    --offlineExplorer-main-button-background-color-hover:#515253;
+    --offlineExplorer-main-button-font-color-hover:#24acf2;
+    --offlineExplorer-main-button-image-hover-color-svg:invert(61%) sepia(39%) saturate(4561%) hue-rotate(171deg) brightness(101%) contrast(90%);
+    
+    /* see more https://codepen.io/philcheng/pen/YWyYwG?editors=1100 */
+
+    --offlineExplorer-main-button-font-color:#ffffff;
     --offlineExplorer-drive-background-color: #202020;
     --offlineExplorer-drive-hover-background-color:#363636;
 
@@ -31,5 +39,7 @@
     --offlineExplorer-drive-background-color-skeleton-start:#191919;
     --offlineExplorer-drive-background-color-skeleton-end:#222020;
 
+    --offlineExplorer-not-interractive: #a6a6a6;
+    --offlineExplorer-not-interractive-svg: invert(79%) sepia(0%) saturate(1634%) hue-rotate(249deg) brightness(86%) contrast(84%);
     --offlineExplorer-file-info-down-display-line-color:black;
 }
