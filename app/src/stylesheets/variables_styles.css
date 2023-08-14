@@ -42,4 +42,7 @@
     --offlineExplorer-not-interractive: #a6a6a6;
     --offlineExplorer-not-interractive-svg: invert(79%) sepia(0%) saturate(1634%) hue-rotate(249deg) brightness(86%) contrast(84%);
     --offlineExplorer-file-info-down-display-line-color:black;
+
+    --offlineExplorer-main-modal-background-color:#494a4bc2;
+    --offlineExplorer-main-modal-font-color:#ffffff;
 }

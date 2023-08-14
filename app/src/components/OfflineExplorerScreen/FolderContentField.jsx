@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from 'react'
 
-import dividerArrow from 'Images/divider_arrow.png'
+import { Scrollbar } from 'react-scrollbars-custom';
+import Modal from '../Modal/Modal.jsx'
 
+
+
+import dividerArrow from 'Images/divider_arrow.png'
 import OfflineTableFile from './OfflineTableFile'
 import OfflineDisk from './OfflineDisk'
 import hardDiskImg from 'Images/hard_disk.png'
 import SystemDiskImg from 'Images/systemDisk.png'
-
-import { Scrollbar } from 'react-scrollbars-custom';
 import Folder from 'Images/folder.png'
 import PC from 'Images/pc_icon.png'
 import View from 'Images/view_button.svg'
 import Sorting from 'Images/sorting_button.svg'
 import Share from 'Images/share_button.svg'
 import Property from 'Images/property_button.svg'
-
 import Reload from 'Images/reload.svg'
 import LeftArrow from 'Images/left_arrow.svg'
 import RightArrow from 'Images/right_arrow.svg'
 import UpArrow from 'Images/up_arrow.svg'
+import MenuClose from 'Images/menu_icon_close.svg'
+import MenuOpen from 'Images/menu_icon_open.svg'
+
+import GroupLine from 'Images/group_line.svg'
+import GroupSpred from 'Images/group_spred.svg'
+
+
+import OfflineSpredFile from './OfflineSpredFile.jsx';
+
 
 
 export default function FolderContentField() {
-
     const [files, setFiles] = useState([])
     const [directory, setDirectory] = useState('')
     const [coreDir, setCoreDir] = useState([])
@@ -30,11 +39,33 @@ export default function FolderContentField() {
     const [prevDirectory, setPrevDirectory] = useState('')
     const [nextDirectory, setNextDirectory] = useState('')
 
+    const [modalView, setModalView] = useState(false)
+
+    const [hidenModal, setHidenModal] = useState(false)
+    const [hidenModalView, setHidenModalView] = useState(false)
+
+    const [showType, setShowType] = useState('in-line')
+    const [isSorting, setIsSorting] = useState(false)
+    const [sortType, setSortType] = useState('Folder')
+
     const goToNextFolder = async (file) =>{
         try {
             if(file.type === 'Folder'){
                 const resFiles = await window.api.getFilesFromPath(`${directory}\\${file.name}`)
-                setFiles([...resFiles])
+
+                //On testing
+                const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+                //On testing
+
+                //temp REDO!!!
+                if(isSorting){
+                    tempSortingFunc(resFilteredFiles)
+                }else{
+                    setFiles([...resFilteredFiles])
+                }
+                //temp REDO!!!
+
+                // setFiles([...resFilteredFiles])
                 setPrevDirectory(directory)
                 setDirectory(`${directory}\\${file.name}`)
             }else {
@@ -49,11 +80,23 @@ export default function FolderContentField() {
         try {
             console.log(path, directory)
             const resFiles = await window.api.getFilesFromPath(getPrevDirectory(directory,path))
+
+            //On testing
+            const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+            //On testing
+
             setNextDirectory(directory)
             setDirectory(getPrevDirectory(directory,path))
-            setFiles([...resFiles])
-            // console.log(JSON.stringify(resFiles))
-            // console.log(resFiles)
+            // setFiles([...resFilteredFiles])
+            
+            //temp REDO!!!
+                if(isSorting){
+                    tempSortingFunc(resFilteredFiles)
+                }else{
+                    setFiles([...resFilteredFiles])
+                }
+            //temp REDO!!!
+
         } catch (error) {
             console.log(error)
         }
@@ -79,7 +122,21 @@ export default function FolderContentField() {
     const reloadFunc = async () => {
         if(directory.length > 1){
             const resFiles = await window.api.getFilesFromPath(directory)
-            setFiles([...resFiles])
+
+            //On testing
+            const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+            //On testing
+
+            // setFiles([...resFilteredFiles])
+
+            //temp REDO!!!
+            if(isSorting){
+                tempSortingFunc(resFilteredFiles)
+            }else{
+                setFiles([...resFilteredFiles])
+            }
+            //temp REDO!!!
+
         }else {
             location.reload()
         }
@@ -90,7 +147,21 @@ export default function FolderContentField() {
         if(prevDirectory.length > 0){
             setCoreDir([])
             const resFiles = await window.api.getFilesFromPath(prevDirectory)
-            setFiles([...resFiles])
+            
+            //On testing
+            const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+            //On testing
+            
+            // setFiles([...resFilteredFiles])
+
+           //temp REDO!!!
+            if(isSorting){
+                tempSortingFunc(resFilteredFiles)
+            }else{
+                setFiles([...resFilteredFiles])
+            }
+            //temp REDO!!!
+
             setNextDirectory(directory)
             setDirectory(prevDirectory)
             setPrevDirectory('')
@@ -101,7 +172,21 @@ export default function FolderContentField() {
         if(nextDirectory.length > 0){
             setCoreDir([])
             const resFiles = await window.api.getFilesFromPath(nextDirectory)
-            setFiles([...resFiles])
+
+            //On testing
+            const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+            //On testing
+            
+            // setFiles([...resFilteredFiles])
+
+           //temp REDO!!!
+            if(isSorting){
+                tempSortingFunc(resFilteredFiles)
+            }else{
+                setFiles([...resFilteredFiles])
+            }
+            //temp REDO!!!
+
             setPrevDirectory(directory)
             setDirectory(nextDirectory)
             setNextDirectory('')
@@ -127,14 +212,42 @@ export default function FolderContentField() {
         try {
             if(path.length == 3){
                 const resFiles = await window.api.getFilesFromPath(path.slice(0, -1))
+
+                //On testing
+                const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+                //On testing
+
                 setCoreDir([])
                 setDirectory(path)
-                setFiles([...resFiles])
+                // setFiles([...resFilteredFiles])
+
+                //temp REDO!!!
+                if(isSorting){
+                    tempSortingFunc(resFilteredFiles)
+                }else{
+                    setFiles([...resFilteredFiles])
+                }
+                //temp REDO!!!
+
             }else {
                 const resFiles = await window.api.getFilesFromPath(path)
+
+                //On testing
+                const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+                //On testing
+
                 setCoreDir([])
                 setDirectory(path)
-                setFiles([...resFiles])
+                // setFiles([...resFilteredFiles])
+
+                //temp REDO!!!
+                if(isSorting){
+                    tempSortingFunc(resFilteredFiles)
+                }else{
+                    setFiles([...resFilteredFiles])
+                }
+                //temp REDO!!!
+
             } 
         } catch (error) {
             console.log(error)
@@ -144,6 +257,32 @@ export default function FolderContentField() {
         getStartingPath()
     },[])
 
+    //temp!!!!!!!!!!
+
+    const tempSortingFunc = (sortingFiles,isChanged = false) => {
+        if(files !== undefined){
+            setIsSorting(true)
+            if(sortType === 'Folder'){
+                const sortFiles = sortingFiles.sort((x,y)=>x.type === 'File' ? 1 : y.type === 'File' ? -1 : 0)
+                setFiles([...sortFiles])
+                if(isChanged){
+                    setSortType('Files')
+                }
+                // console.log('Folder=>File', isChanged,sortType)
+            }else {
+                const sortFiles = sortingFiles.sort((x,y)=>x.type === 'Folder' ? 1 : y.type === 'Folder' ? -1 : 0)
+                setFiles([...sortFiles])
+                if(isChanged){
+                    setSortType('Folder')
+                }
+                // console.log('File=>Folder',isChanged,sortType)
+            }
+            // setFiles([...sortingFiles])
+            // console.log('sorting...',sortingFiles)
+        }
+    }
+
+    //temp!!!!!!!!!!
   return (
     <div className="folder_content_and_properties_container">
         <div className="properties_container">
@@ -162,7 +301,7 @@ export default function FolderContentField() {
                 <div className='intaractive_path'>
                     {directory.length < 4
                     ? <div className='start_path_container'>
-                        <p className={directory.length !== 0 && 'this_pc'} onClick={()=> getStartingPath()}>This PC</p> 
+                        <p className={directory.length !== 0 ? 'this_pc' : undefined} onClick={()=> getStartingPath()}>This PC</p> 
                         {directory.length !== 0 && 
                         <>
                         <img src={dividerArrow} alt="divide_arrow" />
@@ -207,19 +346,33 @@ export default function FolderContentField() {
             </div>
             <div className='properties_buttons'>
                 <div className='properties_buttons_visible'>
-                    <button><img src={View} alt="view image" /> view</button>
-                    <button><img src={Sorting} alt="sorting image" /> sorting</button>
+                    <button onClick={()=>{setModalView(!modalView)}}><img src={View} alt="view image" /> view</button>
+                    <button onClick={()=>isSorting? tempSortingFunc(files,true) : tempSortingFunc(files)}><img src={Sorting} alt="sorting image" /> sorting</button>
                     <button><img src={Share} alt="share image" /> Share</button>
                     <button><img src={Property} alt="property image" /> Properties</button>
+                    <Modal visible={modalView} setVisible={setModalView} params={{background:false, type:'right', spec:'prop_buttons_view'}}>
+                    <button onClick={()=>{setShowType('in-line');setModalView(!modalView)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
+                    <button onClick={()=>{setShowType('spred');setModalView(!modalView)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>
+                    </Modal>
                 </div>
-                <div className='properties_buttons_hiden'>
-                    f off
+                <div className='properties_buttons_hiden' onClick={()=>{setHidenModal(!hidenModal)}}>
+                    <button className='menu_hidden_button'><img src={hidenModal ? MenuClose : MenuOpen} alt="Menu icon" /></button>
+                    <Modal visible={hidenModal} setVisible={setHidenModal} params={{background:false, type:'right', spec:'prop_buttons_hiden'}}>
+                        <button onClick={()=>{setHidenModalView(!hidenModalView)}}><img src={View} alt="view image" /> view</button>
+                        <button><img src={Sorting} alt="sorting image" /> sorting</button>
+                        <button><img src={Share} alt="share image" /> Share</button>
+                        <button><img src={Property} alt="property image" /> Properties</button>
+                        <Modal visible={hidenModalView} setVisible={setHidenModalView} params={{background:false, type:'right', spec:'prop_buttons_view_hiden'}}>
+                            <button onClick={()=>{setShowType('in-line');setHidenModalView(!hidenModalView);setHidenModal(!hidenModal)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
+                            <button onClick={()=>{setShowType('spred');setHidenModalView(!hidenModalView);setHidenModal(!hidenModal)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>
+                        </Modal>
+                    </Modal>
                 </div>
             </div>
         </div>
         </div> 
         <div className="folder_content_container" >
-        {(coreDir.length === 0 && files.length > 0) &&
+        {(coreDir.length === 0 && files.length > 0 && showType === 'in-line') &&
             <div className="header_of_file_table">
                 <p className="name_h">Name</p>
                 <p className="type_h">Type</p>
@@ -228,21 +381,42 @@ export default function FolderContentField() {
             </div>
         }
             <div className="file_tabel">
-                <Scrollbar style={{ width: "100%", height: "100%" }}>
+                
                 {coreDir.length > 0 
-                ? <div className='disk_container'>
-                    {coreDir.map(dir => <OfflineDisk diskDir={dir} disksInfo = {drives} goToDisk={()=>goToDisk(dir.path)}/>)}
-                </div>  
-                : files.length > 0 
-                    ? files.map(file =><OfflineTableFile
-                        file={file}
-                        goToNextFolder={()=>{goToNextFolder(file)}} 
-                        date_c={file.Stats !== undefined && JSON.stringify(file.Stats.ctime).split('T')[0].split('-').join('/').slice(1) }
-                        date_m={file.Stats !== undefined && JSON.stringify(file.Stats.atime).split('T')[0].split('-').join('/').slice(1) }
-                        />)
-                    : <p className='info_no_files'>No files found</p>
-                }
+                ?<Scrollbar style={{ width: "100%", height: "100%" }} noScrollX> 
+                        <div className='disk_container'>
+                            {coreDir.map((dir, i )=> <OfflineDisk key={i} diskDir={dir} disksInfo = {drives} goToDisk={()=>goToDisk(dir.path)}/>)}
+                        </div> 
+                    </Scrollbar> 
+                : showType === 'in-line' 
+                ?<Scrollbar style={{ width: "100%", height: "100%" }} noScrollX>
+                    {files.length > 0 
+                        ? files.map((file, i) =><OfflineTableFile
+                            file={file}
+                            goToNextFolder={()=>{goToNextFolder(file)}} 
+                            date_c={file.Stats !== undefined && JSON.stringify(file.Stats.ctime).split('T')[0].split('-').join('/').slice(1) }
+                            date_m={file.Stats !== undefined && JSON.stringify(file.Stats.atime).split('T')[0].split('-').join('/').slice(1) }
+                            key={i}
+                            />)
+                        : <p className='info_no_files'>No files found</p>}
+                 </Scrollbar>   
+                : showType === 'spred' && 
+                <Scrollbar style={{ width: "100%", height: "100%" }} noScrollX>
+                <div className='spred_files_container'>
+                    
+                    {files.length > 0 
+                        ? files.map((file, i) =><OfflineSpredFile
+                            file={file}
+                            goToNextFolder={()=>{goToNextFolder(file)}} 
+                            date_c={file.Stats !== undefined && JSON.stringify(file.Stats.ctime).split('T')[0].split('-').join('/').slice(1) }
+                            date_m={file.Stats !== undefined && JSON.stringify(file.Stats.atime).split('T')[0].split('-').join('/').slice(1) }
+                            key={i}
+                            />)
+                        : <p className='info_no_files'>No files found</p>}
+                    
+                </div>
                 </Scrollbar>
+                }
             </div>
         </div>
         <div className='fileinfo_down_display'><p>{(files.length >0 && coreDir.length == 0 ) ? files.length == 1 ? files.length + ' item' : files.length + ' items' : null}</p> {(files.length >0 && coreDir.length == 0 ) && <div></div>}</div>

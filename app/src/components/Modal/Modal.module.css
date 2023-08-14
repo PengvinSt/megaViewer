@@ -1,0 +1,73 @@
+.Modal {
+    position: fixed;
+    display: none;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+}
+.ModalBackground {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.full {
+    
+    justify-content: center;
+    align-items: center;
+}
+
+
+.right {
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.Modal.active{
+    display: flex;
+}
+
+.spec_prop_buttons_view {
+    margin-right: 247px;
+    margin-top: 110px;
+}
+
+.spec_prop_buttons_view_hiden {
+    margin-right: 155px;
+    margin-top: 110px;
+}
+
+.spec_prop_buttons_hiden {
+    margin-right: 10px;
+    margin-top: 110px;
+}
+
+.spec_prop_buttons_hiden button {
+    width: 100%;
+}
+
+
+.spec_prop_buttons_view_content {
+    padding: 10px;
+    border-radius: 5px;
+    gap:10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90px;
+    
+}
+.spec_prop_buttons_hiden_content {
+    padding: 10px;
+    border-radius: 5px;
+    gap:10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 140px;
+}
+
+.ModalContent {
+    background-color: var(--offlineExplorer-main-modal-background-color);
+    color:var(--offlineExplorer-main-modal-font-color);
+}

@@ -1,5 +1,5 @@
 /* * {
-    border: 1px solid black;
+    border: 1px solid green;
 } */
 
 .offline_explorer_screen_container {
@@ -71,9 +71,11 @@
 /* file table temp */
 
 .file_tabel {
+    /* border: 1px solid red; */
     display: flex;
     flex-direction: column;
     height: 97%;
+    width: 100%;
 }
 /* REDO!!!!(Start) */
 .name_h {
@@ -101,6 +103,14 @@
     padding: 15px 0 15px 0;
     border: 1px solid transparent;
 }
+.file p, .file p img {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .file:hover{
     background-color: var(--offlineExplorer-file-hover-background-color);
     
@@ -298,7 +308,7 @@
 }
 
 
-.properties_buttons_visible, .nav_buttons_container {
+.properties_buttons_visible,.properties_buttons_hiden, .nav_buttons_container {
     display: flex;
     align-items: center;
     gap:5px;
@@ -308,7 +318,7 @@
     margin-right: 10px;
     margin-bottom: 23px;
 }
-.nav_buttons_container button, .properties_buttons_visible button {
+.nav_buttons_container button, .properties_buttons_visible button,.properties_buttons_hiden button {
     background:var(--offlineExplorer-main-background-color);
     color: var(--offlineExplorer-main-button-font-color);
     border-radius: 4px;
@@ -319,7 +329,7 @@
     cursor: pointer;
 }
 
-.properties_buttons_visible button{
+.properties_buttons_visible button, .properties_buttons_hiden button{
     background-color: var(--offlineExplorer-main-button-background-color);
     font-size: 14px;
     font-weight: 300;
@@ -331,17 +341,22 @@
     height: 25px;
 }
 
-.properties_buttons button:hover, .nav_buttons_container button:hover {
+.properties_buttons button:hover, .nav_buttons_container button:hover, .properties_buttons_hiden button:hover {
     background:var(--offlineExplorer-main-button-background-color-hover);
     color:var(--offlineExplorer-main-button-font-color-hover);
 }
 
-.properties_buttons_visible button:hover img, .nav_buttons_container button:hover img {
+.properties_buttons_visible button:hover img, .nav_buttons_container button:hover img, .properties_buttons_hiden button:hover img {
     filter: var(--offlineExplorer-main-button-image-hover-color-svg);
 }
 
 .properties_buttons_hiden {
     display: none;
+}
+
+.menu_hidden_button img {
+    width: 25px;
+    height: 25px;
 }
 
 @media screen and (max-width: 1000px) {
@@ -353,3 +368,46 @@
     }
 }
 
+.spred_files_container {
+    /* border: 1px solid red; */
+    width: 100%;
+    gap:15px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.file_spred {
+    height: 80px;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap:10px;
+    /* border: 1px solid red; */
+    cursor: pointer;
+    block-size: fit-content;
+    padding: 5px;
+}
+.file_spred img {
+    height: 60px;
+    width: 60px;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.file_spred p {
+    text-align: center;
+    font-size: 12px;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.file_spred:hover{
+    background-color: var(--offlineExplorer-file-hover-background-color);
+}
