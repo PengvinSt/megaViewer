@@ -17,17 +17,25 @@ export default function Modal({children, visible, setVisible, params}) {
       if(params.type === 'full'){
         rootClasses.push(classes.full)
       }
-      if(params.spec === 'prop_buttons_view'){
-        rootClasses.push(classes.spec_prop_buttons_view)
-        contentClasses.push(classes.spec_prop_buttons_view_content)
-      }
       if(params.spec === 'prop_buttons_hiden'){
         rootClasses.push(classes.spec_prop_buttons_hiden)
         contentClasses.push(classes.spec_prop_buttons_hiden_content)
       }
+      if(params.spec === 'prop_buttons_view'){
+        rootClasses.push(classes.spec_prop_buttons_view)
+        contentClasses.push(classes.spec_prop_buttons_view_content)
+      }
       if(params.spec === 'prop_buttons_view_hiden'){
         rootClasses.push(classes.spec_prop_buttons_view_hiden)
         contentClasses.push(classes.spec_prop_buttons_view_content)
+      }
+      if(params.spec === 'prop_buttons_sort'){
+        rootClasses.push(classes.spec_prop_buttons_sort)
+        contentClasses.push(classes.spec_prop_buttons_sort_content)
+      }
+      if(params.spec === 'prop_buttons_sort_hiden'){
+        rootClasses.push(classes.spec_prop_buttons_sort_hiden)
+        contentClasses.push(classes.spec_prop_buttons_sort_content)
       }
     }
   return (

@@ -39,14 +39,18 @@ export default function FolderContentField() {
     const [prevDirectory, setPrevDirectory] = useState('')
     const [nextDirectory, setNextDirectory] = useState('')
 
-    const [modalView, setModalView] = useState(false)
+    
+    const [showType, setShowType] = useState('in-line')
+    const [sortType, setSortType] = useState('')
+    const [isSorting, setIsSorting] = useState(false)
 
     const [hidenModal, setHidenModal] = useState(false)
     const [hidenModalView, setHidenModalView] = useState(false)
+    const [hidenModalSort, setHidenModalSort] = useState(false)
 
-    const [showType, setShowType] = useState('in-line')
-    const [isSorting, setIsSorting] = useState(false)
-    const [sortType, setSortType] = useState('Folder')
+    const [modalView, setModalView] = useState(false)
+    const [modalSort, setModalSort] = useState(false)
+    
 
     const goToNextFolder = async (file) =>{
         try {
@@ -59,7 +63,7 @@ export default function FolderContentField() {
 
                 //temp REDO!!!
                 if(isSorting){
-                    tempSortingFunc(resFilteredFiles)
+                    sortingFunc(resFilteredFiles)
                 }else{
                     setFiles([...resFilteredFiles])
                 }
@@ -91,7 +95,7 @@ export default function FolderContentField() {
             
             //temp REDO!!!
                 if(isSorting){
-                    tempSortingFunc(resFilteredFiles)
+                    sortingFunc(resFilteredFiles)
                 }else{
                     setFiles([...resFilteredFiles])
                 }
@@ -131,7 +135,7 @@ export default function FolderContentField() {
 
             //temp REDO!!!
             if(isSorting){
-                tempSortingFunc(resFilteredFiles)
+                sortingFunc(resFilteredFiles)
             }else{
                 setFiles([...resFilteredFiles])
             }
@@ -156,7 +160,7 @@ export default function FolderContentField() {
 
            //temp REDO!!!
             if(isSorting){
-                tempSortingFunc(resFilteredFiles)
+                sortingFunc(resFilteredFiles)
             }else{
                 setFiles([...resFilteredFiles])
             }
@@ -181,7 +185,7 @@ export default function FolderContentField() {
 
            //temp REDO!!!
             if(isSorting){
-                tempSortingFunc(resFilteredFiles)
+                sortingFunc(resFilteredFiles)
             }else{
                 setFiles([...resFilteredFiles])
             }
@@ -223,7 +227,7 @@ export default function FolderContentField() {
 
                 //temp REDO!!!
                 if(isSorting){
-                    tempSortingFunc(resFilteredFiles)
+                    sortingFunc(resFilteredFiles)
                 }else{
                     setFiles([...resFilteredFiles])
                 }
@@ -242,7 +246,7 @@ export default function FolderContentField() {
 
                 //temp REDO!!!
                 if(isSorting){
-                    tempSortingFunc(resFilteredFiles)
+                    sortingFunc(resFilteredFiles)
                 }else{
                     setFiles([...resFilteredFiles])
                 }
@@ -259,28 +263,119 @@ export default function FolderContentField() {
 
     //temp!!!!!!!!!!
 
-    const tempSortingFunc = (sortingFiles,isChanged = false) => {
+    const buttonFileFolderSortingFunc = ()=> {
         if(files !== undefined){
+            if(sortType === 'Folder' && isSorting){
+                const sort = 'File'
+                setSortType(sort)
+            }else {
+                const sort = 'Folder'
+                setSortType(sort)
+            }
             setIsSorting(true)
+            if(modalSort){
+                setModalSort(!modalSort)
+            }else{
+                setHidenModal(!hidenModal)
+            }
+            
+        }
+    }
+    const buttonAlphabetrSortingFunc = ()=> {
+        if(files !== undefined){
+            if(sortType === 'a-z' && isSorting){
+                const sort = 'z-a'
+                setSortType(sort)
+            }else {
+                const sort = 'a-z'
+                setSortType(sort)
+            }
+            setIsSorting(true)
+            if(modalSort){
+                setModalSort(!modalSort)
+            }else{
+                setHidenModal(!hidenModal)
+            }
+            
+        }
+    }
+    const buttonDateCreatedSortingFunc = ()=> {
+        if(files !== undefined){
+            if(sortType === 'Date(C)New' && isSorting){
+                const sort = 'Date(C)Old'
+                setSortType(sort)
+            }else {
+                const sort = 'Date(C)New'
+                setSortType(sort)
+            }
+            setIsSorting(true)
+            if(modalSort){
+                setModalSort(!modalSort)
+            }else{
+                setHidenModal(!hidenModal)
+            }
+            
+        }
+    }
+    const buttonDateModifiedSortingFunc = ()=> {
+        if(files !== undefined){
+            if(sortType === 'Date(M)New' && isSorting){
+                const sort = 'Date(M)Old'
+                setSortType(sort)
+            }else {
+                const sort = 'Date(M)New'
+                setSortType(sort)
+            }
+            setIsSorting(true)
+            if(modalSort){
+                setModalSort(!modalSort)
+            }else{
+                setHidenModal(!hidenModal)
+            }
+            
+        }
+    }
+
+    const sortingFunc = (sortingFiles) => {
+        if(isSorting){
             if(sortType === 'Folder'){
                 const sortFiles = sortingFiles.sort((x,y)=>x.type === 'File' ? 1 : y.type === 'File' ? -1 : 0)
                 setFiles([...sortFiles])
-                if(isChanged){
-                    setSortType('Files')
-                }
-                // console.log('Folder=>File', isChanged,sortType)
-            }else {
+            }
+            if(sortType === 'File'){
                 const sortFiles = sortingFiles.sort((x,y)=>x.type === 'Folder' ? 1 : y.type === 'Folder' ? -1 : 0)
                 setFiles([...sortFiles])
-                if(isChanged){
-                    setSortType('Folder')
-                }
-                // console.log('File=>Folder',isChanged,sortType)
             }
-            // setFiles([...sortingFiles])
-            // console.log('sorting...',sortingFiles)
+            if(sortType === 'a-z'){
+                const sortFiles = sortingFiles.sort((x,y)=>x.name.toLowerCase() < y.name.toLowerCase() ? -1 : x.name.toLowerCase() > y.name.toLowerCase() ? 1 : 0)
+                setFiles([...sortFiles])
+            }
+            if(sortType === 'z-a'){
+                const sortFiles = sortingFiles.sort((x,y)=>x.name.toLowerCase() > y.name.toLowerCase() ? -1 : x.name.toLowerCase() < y.name.toLowerCase() ? 1 : 0)
+                setFiles([...sortFiles])
+            }
+            if(sortType === 'Date(C)New'){
+                const sortFiles = sortingFiles.sort((x,y)=>new Date(y.Stats.ctime.toISOString().split('T')[0]).getTime() - new Date(x.Stats.ctime.toISOString().split('T')[0]).getTime())
+                setFiles([...sortFiles])
+            }
+            if(sortType === 'Date(C)Old'){
+                const sortFiles = sortingFiles.sort((x,y)=>new Date(x.Stats.ctime.toISOString().split('T')[0]).getTime() - new Date(y.Stats.ctime.toISOString().split('T')[0]).getTime())
+                setFiles([...sortFiles])
+            }
+            if(sortType === 'Date(M)New'){
+                const sortFiles = sortingFiles.sort((x,y)=>new Date(y.Stats.atime.toISOString().split('T')[0]).getTime() - new Date(x.Stats.atime.toISOString().split('T')[0]).getTime())
+                setFiles([...sortFiles])
+            }
+            if(sortType === 'Date(M)Old'){
+                const sortFiles = sortingFiles.sort((x,y)=>new Date(x.Stats.atime.toISOString().split('T')[0]).getTime() - new Date(y.Stats.atime.toISOString().split('T')[0]).getTime())
+                setFiles([...sortFiles])
+            }
         }
     }
+
+    useEffect(()=>{
+        sortingFunc(files)
+    }, [isSorting,sortType])
 
     //temp!!!!!!!!!!
   return (
@@ -310,7 +405,7 @@ export default function FolderContentField() {
                         }
                       </div>
                     : <>
-                        <h1>{directory.split('\\').slice(-1)[0].length > 25 ? directory.split('\\').slice(-1)[0].slice(0,10)+`...` : directory.split('\\').slice(-1)[0]}</h1>
+                        <h1>{directory.split('\\').slice(-1)[0].length > 20 ? directory.split('\\').slice(-1)[0].slice(0,20)+`...` : directory.split('\\').slice(-1)[0]}</h1>
                         <div className='intaractive_path_inner_div'>
                         {directory.split('\\').length < 4 
                             ? directory.split('\\').map((path, i)=>
@@ -347,24 +442,36 @@ export default function FolderContentField() {
             <div className='properties_buttons'>
                 <div className='properties_buttons_visible'>
                     <button onClick={()=>{setModalView(!modalView)}}><img src={View} alt="view image" /> view</button>
-                    <button onClick={()=>isSorting? tempSortingFunc(files,true) : tempSortingFunc(files)}><img src={Sorting} alt="sorting image" /> sorting</button>
+                    <button onClick={()=>{setModalSort(!modalSort)}}><img src={Sorting} alt="sorting image" /> sorting</button>
                     <button><img src={Share} alt="share image" /> Share</button>
                     <button><img src={Property} alt="property image" /> Properties</button>
                     <Modal visible={modalView} setVisible={setModalView} params={{background:false, type:'right', spec:'prop_buttons_view'}}>
-                    <button onClick={()=>{setShowType('in-line');setModalView(!modalView)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
-                    <button onClick={()=>{setShowType('spred');setModalView(!modalView)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>
+                            <button onClick={()=>{setShowType('in-line');setModalView(!modalView)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
+                            <button onClick={()=>{setShowType('spred');setModalView(!modalView)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>
+                    </Modal>
+                    <Modal visible={modalSort} setVisible={setModalSort} params={{background:false, type:'right', spec:'prop_buttons_sort'}}>
+                            <button onClick={()=> buttonFileFolderSortingFunc()}>{sortType === 'Folder' ? <p>File</p>:<p>Folder</p> }</button>
+                            <button onClick={()=> buttonAlphabetrSortingFunc()}>{sortType === 'a-z' ? <p>z-a</p>: <p>a-z</p>}</button>
+                            <button onClick={()=> buttonDateCreatedSortingFunc()}>{sortType === 'Date(C)New' ? <p>Date(C) (Old)</p>: <p>Date(C) (New)</p>}</button>
+                            <button onClick={()=> buttonDateModifiedSortingFunc()}>{sortType === 'Date(M)New' ? <p>Date(M) (Old)</p>: <p>Date(M) (New)</p>}</button>
                     </Modal>
                 </div>
                 <div className='properties_buttons_hiden' onClick={()=>{setHidenModal(!hidenModal)}}>
                     <button className='menu_hidden_button'><img src={hidenModal ? MenuClose : MenuOpen} alt="Menu icon" /></button>
                     <Modal visible={hidenModal} setVisible={setHidenModal} params={{background:false, type:'right', spec:'prop_buttons_hiden'}}>
                         <button onClick={()=>{setHidenModalView(!hidenModalView)}}><img src={View} alt="view image" /> view</button>
-                        <button><img src={Sorting} alt="sorting image" /> sorting</button>
+                        <button onClick={()=>{setHidenModalSort(!hidenModalSort)}}><img src={Sorting} alt="sorting image" /> sorting</button>
                         <button><img src={Share} alt="share image" /> Share</button>
                         <button><img src={Property} alt="property image" /> Properties</button>
                         <Modal visible={hidenModalView} setVisible={setHidenModalView} params={{background:false, type:'right', spec:'prop_buttons_view_hiden'}}>
                             <button onClick={()=>{setShowType('in-line');setHidenModalView(!hidenModalView);setHidenModal(!hidenModal)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
                             <button onClick={()=>{setShowType('spred');setHidenModalView(!hidenModalView);setHidenModal(!hidenModal)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>
+                        </Modal>
+                        <Modal visible={hidenModalSort} setVisible={setHidenModalSort} params={{background:false, type:'right', spec:'prop_buttons_sort_hiden'}}>
+                            <button onClick={()=> buttonFileFolderSortingFunc()}>{sortType === 'Folder' ? <p>File</p>:<p>Folder</p> }</button>
+                            <button onClick={()=> buttonAlphabetrSortingFunc()}>{sortType === 'a-z' ? <p>z-a</p>: <p>a-z</p>}</button>
+                            <button onClick={()=> buttonDateCreatedSortingFunc()}>{sortType === 'Date(C)New' ? <p>Date(C) (Old)</p>: <p>Date(C) (New)</p>}</button>
+                            <button onClick={()=> buttonDateModifiedSortingFunc()}>{sortType === 'Date(M)New' ? <p>Date(M) (Old)</p>: <p>Date(M) (New)</p>}</button>
                         </Modal>
                     </Modal>
                 </div>

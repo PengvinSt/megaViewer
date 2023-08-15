@@ -31,6 +31,14 @@
     margin-right: 247px;
     margin-top: 110px;
 }
+.spec_prop_buttons_sort_hiden {
+    margin-right: 155px;
+    margin-top: 110px;
+}
+.spec_prop_buttons_sort {
+    margin-right: 155px;
+    margin-top: 110px;
+}
 
 .spec_prop_buttons_view_hiden {
     margin-right: 155px;
@@ -46,7 +54,21 @@
     width: 100%;
 }
 
-
+.spec_prop_buttons_sort_content {
+    padding: 10px;
+    border-radius: 5px;
+    gap:10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 130px;
+}
+.spec_prop_buttons_sort_content button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .spec_prop_buttons_view_content {
     padding: 10px;
     border-radius: 5px;
@@ -55,7 +77,6 @@
     flex-direction: column;
     align-items: center;
     width: 90px;
-    
 }
 .spec_prop_buttons_hiden_content {
     padding: 10px;

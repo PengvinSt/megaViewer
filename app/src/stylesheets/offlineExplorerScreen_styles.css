@@ -103,7 +103,7 @@
     padding: 15px 0 15px 0;
     border: 1px solid transparent;
 }
-.file p, .file p img {
+.file p, .file div img {
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -moz-user-select: none;
@@ -113,8 +113,8 @@
 
 .file:hover{
     background-color: var(--offlineExplorer-file-hover-background-color);
-    
 }
+
 .info_no_files {
     margin: 20px 0 0 20px;
 }
@@ -409,5 +409,12 @@
     user-select: none;
 }
 .file_spred:hover{
+    background-color: var(--offlineExplorer-file-hover-background-color);
+}
+
+.file_spred_chosen {
+    background-color: var(--offlineExplorer-file-hover-background-color);
+}
+.file_spred_chosen p {
     background-color: var(--offlineExplorer-file-hover-background-color);
 }
