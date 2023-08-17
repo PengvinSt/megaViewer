@@ -1,0 +1,17 @@
+:root {
+    --window-main-background-color:#191919;
+    --window-main-font-color: #FFFFFF;
+
+    --window-left-bar-background-color:#202020;
+
+    --window-main-button-background-color:#494a4b;
+    --window-main-button-background-color-hover:#515253;
+
+    --window-fill-indicator-filled:#4e9de5;
+    --window-fill-indicator-empty:#2b5278;
+    --window-fill-indicator-alert:#e71426;
+
+    --window-main-button-font-color:#eee;
+    --window-main-button-background-color:#494a4b;
+    --window-main-button-background-color-hover:#515253;
+}

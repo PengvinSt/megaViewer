@@ -373,6 +373,32 @@ export default function FolderContentField() {
         }
     }
 
+    const isAppear =(array, find,isObject=false, keyName) => {
+        let count = 0;
+        
+        if(isObject){
+            array.forEach((value) => (value[`${keyName}`] === find && count++));
+        }else{
+            array.forEach((value) => (value === find && count++));
+        }
+        return count;
+    }
+
+    const buttonPropertiesFunc = async () =>{
+        console.log(isAppear(files,'File',true,"type"))
+        if(coreDir.length === 0 ){
+            const data = {
+                name:directory.split('\\').slice(-1)[0],
+                path:directory,
+                type:'Folder',
+                foldersCount:isAppear(files,'Folder',true,"type"),
+                filesCount:isAppear(files,'File',true,"type"),
+                size:'NaN'
+            }
+            await window.api.spawnPropertiesWindow(data)
+        }
+    }
+
     useEffect(()=>{
         sortingFunc(files)
     }, [isSorting,sortType])
@@ -444,7 +470,7 @@ export default function FolderContentField() {
                     <button onClick={()=>{setModalView(!modalView)}}><img src={View} alt="view image" /> view</button>
                     <button onClick={()=>{setModalSort(!modalSort)}}><img src={Sorting} alt="sorting image" /> sorting</button>
                     <button><img src={Share} alt="share image" /> Share</button>
-                    <button><img src={Property} alt="property image" /> Properties</button>
+                    <button onClick={()=> buttonPropertiesFunc()}><img src={Property} alt="property image" /> Properties</button>
                     <Modal visible={modalView} setVisible={setModalView} params={{background:false, type:'right', spec:'prop_buttons_view'}}>
                             <button onClick={()=>{setShowType('in-line');setModalView(!modalView)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
                             <button onClick={()=>{setShowType('spred');setModalView(!modalView)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>
@@ -462,7 +488,7 @@ export default function FolderContentField() {
                         <button onClick={()=>{setHidenModalView(!hidenModalView)}}><img src={View} alt="view image" /> view</button>
                         <button onClick={()=>{setHidenModalSort(!hidenModalSort)}}><img src={Sorting} alt="sorting image" /> sorting</button>
                         <button><img src={Share} alt="share image" /> Share</button>
-                        <button><img src={Property} alt="property image" /> Properties</button>
+                        <button onClick={()=> buttonPropertiesFunc()}><img src={Property} alt="property image" /> Properties</button>
                         <Modal visible={hidenModalView} setVisible={setHidenModalView} params={{background:false, type:'right', spec:'prop_buttons_view_hiden'}}>
                             <button onClick={()=>{setShowType('in-line');setHidenModalView(!hidenModalView);setHidenModal(!hidenModal)}} style={{background:showType === 'in-line' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'in-line' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupLine} alt="group" style={{filter:showType === 'in-line' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> In line</button>
                             <button onClick={()=>{setShowType('spred');setHidenModalView(!hidenModalView);setHidenModal(!hidenModal)}} style={{background:showType === 'spred' ? 'var(--offlineExplorer-main-button-background-color-hover)' : 'var(--offlineExplorer-main-button-background-color)', color: showType === 'spred' ? 'var(--offlineExplorer-main-button-font-color-hover)' : 'var(--offlineExplorer-main-button-font-color)'}}><img src={GroupSpred} alt="group" style={{filter:showType === 'spred' ? 'var(--offlineExplorer-main-button-image-hover-color-svg)' : undefined}}/> Spred</button>

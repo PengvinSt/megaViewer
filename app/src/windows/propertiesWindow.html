@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>propertiesWindow</title>
+    <link rel="stylesheet" href="./propertiesWindow.css">
+    <link rel="stylesheet" href="./variables.css">
+</head>
+<body>
+    <div class="window">
+        <div class="buttons_container">
+
+        </div>
+       <div class="properties_container">
+        <div class="properties_inner">
+            <div class="window_header">
+                <p>Properties</p>
+                <button id="close_button">&#x2715</button>
+            </div>
+            <div class="name_container">
+                <img src="../../../resources/images/empty_folder.png" alt="file/folder img">
+                <input type="text" placeholder="" id="name_input">
+            </div>
+            <div class="file_size_container">
+                <div class="file_size_repr">
+                    2%
+                </div>
+                <div class="file_size_text">
+                    <p id="size"></p>
+                    <p id="folders_count"></p>
+                    <p id="files_count"></p>
+                </div>
+            </div>
+            <div class="info_container">
+                <div class="name_of_info">
+                    <p>Type:</p>
+                    <p>Location:</p>
+                </div>
+                <div class="info">
+                    <p id="type"></p>
+                    <p id="path"></p>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="properties_inner_buttons">
+            <button id="save">Save</button>
+            <button id="cancel">Cancel</button>
+        </div> -->
+       </div>
+    </div>
+</body>
+<script src="./propertiesWindow.js"></script>
+</html>

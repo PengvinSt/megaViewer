@@ -166,11 +166,16 @@
     gap:2px;
 }
 
-.disk_skeleton {
-    margin-left: 15px;
+.disk_skeleton_loader {
     animation: skeleton-loading 1s linear infinite alternate;
-    width: 235px;
-    height: 60px;
+    width: 160px;
+    height: 18px;
+    border-radius: 5px;
+}
+.disk_skeleton_text {
+    animation: skeleton-loading 1s linear infinite alternate;
+    width: 125px;
+    height: 14px;
     border-radius: 5px;
 }
 

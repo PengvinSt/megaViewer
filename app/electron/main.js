@@ -27,6 +27,48 @@ ipcMain.handle('getStartingPath', async ()=>{
     return drives
 })
 
+
+
+ipcMain.on('spawnPropertiesWindow', (_, data)=>{
+    if(data.path !== undefined){
+        let window = new BrowserWindow({
+            backgroundColor:"#191919",
+            width: 350,
+            height: 500,
+            maxWidth:350,
+            maxHeight:500,
+            minWidth:350,
+            minHeight:500,
+            show:false,
+            frame:false,
+            webPreferences: {
+                worldSafeExecuteJavaScript: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
+        })
+        
+        const menu = new Menu()
+        Menu.setApplicationMenu(menu)
+        window.loadFile("app/src/windows/propertiesWindow.html");
+        window.webContents.on('did-finish-load', ()=>{
+            window.show()
+            window.focus()
+            // window.webContents.openDevTools()
+        })       
+        
+        ipcMain.handle('getWindowData', ()=>{
+            return data
+        })
+        
+        ipcMain.on('closePropWindow', ()=>{
+            window.destroy()
+            ipcMain.removeHandler('getWindowData')
+        })
+
+    }
+})
+
+
 const getFileStats = async (path) => {
     try {
         const stats = await fs.promises.stat(path);
@@ -39,7 +81,7 @@ const getFileStats = async (path) => {
 ipcMain.handle('getFilesFromPath', async (_, path)=>{
     const fixedPath = `${path}\\`
     let rawData = readdirSync(fixedPath,{withFileTypes: true})
-    const results = await Promise.all(rawData.map(async (file) =>{
+    const promiseResults = await Promise.allSettled(rawData.map(async (file) =>{
         const Stats = await getFileStats(fixedPath + file.name)
         return {
             name: file.name,
@@ -47,6 +89,18 @@ ipcMain.handle('getFilesFromPath', async (_, path)=>{
             Stats
         }
     }))
+    const results = []
+    const errors = []
+
+    promiseResults.forEach((result)=>{
+        if (result.status === 'fulfilled'){
+            results.push(result.value)
+            return
+        }
+        errors.push(result.reason)
+    })
+    // console.log(results)
+
     return results
 })
 

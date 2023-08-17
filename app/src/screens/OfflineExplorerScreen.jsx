@@ -1,6 +1,6 @@
 import React from 'react'
 
-import '../stylesheets/offlineExplorerScreen_styles.css'
+import '../stylesheets/offlineExplorerScreen.css'
 import NavigationLeftSlider from '../components/OfflineExplorerScreen/NavigationLeftSlider'
 import FolderContentField from '../components/OfflineExplorerScreen/FolderContentField'
 
