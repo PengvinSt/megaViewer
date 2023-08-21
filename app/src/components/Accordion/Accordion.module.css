@@ -1,0 +1,13 @@
+
+.accordion {
+    /* border: 1px solid red; */
+    margin-left: 20px;
+    background-color: var(--offlineExplorer-main-background-color);
+    color:var(--offlineExplorer-main-font-color);
+    display: none;
+    cursor: pointer;
+}
+
+.active {
+    display: block;
+}

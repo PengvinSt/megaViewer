@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { Scrollbar } from 'react-scrollbars-custom';
 import Modal from '../Modal/Modal.jsx'
 
-
-
 import dividerArrow from 'Images/divider_arrow.png'
 import OfflineTableFile from './OfflineTableFile'
 import OfflineDisk from './OfflineDisk'
@@ -28,6 +26,8 @@ import GroupSpred from 'Images/group_spred.svg'
 
 
 import OfflineSpredFile from './OfflineSpredFile.jsx';
+import { usePathStore } from '../../states/FileState.js';
+
 
 
 
@@ -51,6 +51,30 @@ export default function FolderContentField() {
     const [modalView, setModalView] = useState(false)
     const [modalSort, setModalSort] = useState(false)
     
+    // STATE
+    const pathState = usePathStore((state)=> state.path)
+    const setPathState = usePathStore((state)=> state.setPath)
+    // STATE
+    
+
+    const refreshFiles = async (path) => {
+        if(coreDir.length){
+            setCoreDir([])
+        }
+        const resFiles = await window.api.getFilesFromPath(path)
+         //On testing
+         const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
+         //On testing
+         //temp REDO!!!
+         if(isSorting){
+            sortingFunc(resFilteredFiles)
+         }else{
+            setFiles([...resFilteredFiles])
+         }
+         //temp REDO!!!
+         setPrevDirectory(directory)
+         setDirectory(pathState)
+    }
 
     const goToNextFolder = async (file) =>{
         try {
@@ -82,7 +106,7 @@ export default function FolderContentField() {
     
     const goToPrevFolder = async (path) => {
         try {
-            console.log(path, directory)
+           
             const resFiles = await window.api.getFilesFromPath(getPrevDirectory(directory,path))
 
             //On testing
@@ -130,8 +154,6 @@ export default function FolderContentField() {
             //On testing
             const resFilteredFiles = resFiles.filter(file => file.Stats !== undefined && file)
             //On testing
-
-            // setFiles([...resFilteredFiles])
 
             //temp REDO!!!
             if(isSorting){
@@ -208,6 +230,7 @@ export default function FolderContentField() {
             setFiles([])
             setDirectory('')
             setCoreDir([...path])
+            setPathState('')
         } catch (error) {
             console.log(error)
         }
@@ -257,11 +280,8 @@ export default function FolderContentField() {
             console.log(error)
         }
     }
-    useEffect(()=>{
-        getStartingPath()
-    },[])
+   
 
-    //temp!!!!!!!!!!
 
     const buttonFileFolderSortingFunc = ()=> {
         if(files !== undefined){
@@ -355,11 +375,11 @@ export default function FolderContentField() {
                 setFiles([...sortFiles])
             }
             if(sortType === 'Date(C)New'){
-                const sortFiles = sortingFiles.sort((x,y)=>new Date(y.Stats.ctime.toISOString().split('T')[0]).getTime() - new Date(x.Stats.ctime.toISOString().split('T')[0]).getTime())
+                const sortFiles = sortingFiles.sort((x,y)=>new Date(y.Stats.birthtime.toISOString().split('T')[0]).getTime() - new Date(x.Stats.birthtime.toISOString().split('T')[0]).getTime())
                 setFiles([...sortFiles])
             }
             if(sortType === 'Date(C)Old'){
-                const sortFiles = sortingFiles.sort((x,y)=>new Date(x.Stats.ctime.toISOString().split('T')[0]).getTime() - new Date(y.Stats.ctime.toISOString().split('T')[0]).getTime())
+                const sortFiles = sortingFiles.sort((x,y)=>new Date(x.Stats.birthtime.toISOString().split('T')[0]).getTime() - new Date(y.Stats.birthtime.toISOString().split('T')[0]).getTime())
                 setFiles([...sortFiles])
             }
             if(sortType === 'Date(M)New'){
@@ -383,27 +403,47 @@ export default function FolderContentField() {
         }
         return count;
     }
-
+    const getDiskSize = async (diskName)=>{
+        const disk = await window.api.getDiskSpace(`${diskName}:\\\\`)
+        console.log()
+        return disk.size
+    }
     const buttonPropertiesFunc = async () =>{
-        console.log(isAppear(files,'File',true,"type"))
         if(coreDir.length === 0 ){
-            const data = {
+            const rawData = await window.api.getMoreInfo(directory)
+            const structureData = {
                 name:directory.split('\\').slice(-1)[0],
                 path:directory,
-                type:'Folder',
-                foldersCount:isAppear(files,'Folder',true,"type"),
-                filesCount:isAppear(files,'File',true,"type"),
-                size:'NaN'
+                type:directory.length > 4 ? rawData.type : 'Disk',
+                foldersCount:rawData.type !== 'File' ? isAppear(files,'Folder',true,"type") : null,
+                filesCount:rawData.type !== 'File' ? isAppear(files,'File',true,"type") : null,
+                size:rawData.type === 'File' && rawData.size,
+                diskSize:  await getDiskSize(directory.split(':')[0]),
+                dateC:directory.length > 4 ? rawData.dateC.toISOString().split('T')[0] : null,
+                dateM:directory.length > 4 ? rawData.dateM.toISOString().split('T')[0] : null,
             }
-            await window.api.spawnPropertiesWindow(data)
+            await window.api.spawnPropertiesWindow(structureData)
         }
     }
+
+    useEffect(()=>{
+        getStartingPath()
+    },[])
 
     useEffect(()=>{
         sortingFunc(files)
     }, [isSorting,sortType])
 
-    //temp!!!!!!!!!!
+    useEffect(()=>{
+        if(pathState !== ''){
+            if(pathState === 'Drive'){
+                getStartingPath()
+            }else {
+                refreshFiles(pathState)
+            }
+        }
+    },[pathState])
+
   return (
     <div className="folder_content_and_properties_container">
         <div className="properties_container">
@@ -527,8 +567,8 @@ export default function FolderContentField() {
                         ? files.map((file, i) =><OfflineTableFile
                             file={file}
                             goToNextFolder={()=>{goToNextFolder(file)}} 
-                            date_c={file.Stats !== undefined && JSON.stringify(file.Stats.ctime).split('T')[0].split('-').join('/').slice(1) }
-                            date_m={file.Stats !== undefined && JSON.stringify(file.Stats.atime).split('T')[0].split('-').join('/').slice(1) }
+                            date_c={file.Stats !== undefined && file.Stats.birthtime.toISOString().split('T')[0].split('-').join('/') }
+                            date_m={file.Stats !== undefined && file.Stats.atime.toISOString().split('T')[0].split('-').join('/') }
                             key={i}
                             />)
                         : <p className='info_no_files'>No files found</p>}
@@ -541,8 +581,8 @@ export default function FolderContentField() {
                         ? files.map((file, i) =><OfflineSpredFile
                             file={file}
                             goToNextFolder={()=>{goToNextFolder(file)}} 
-                            date_c={file.Stats !== undefined && JSON.stringify(file.Stats.ctime).split('T')[0].split('-').join('/').slice(1) }
-                            date_m={file.Stats !== undefined && JSON.stringify(file.Stats.atime).split('T')[0].split('-').join('/').slice(1) }
+                            date_c={file.Stats !== undefined && file.Stats.birthtime.toISOString().split('T')[0].split('-').join('/') }
+                            date_m={file.Stats !== undefined && file.Stats.atime.toISOString().split('T')[0].split('-').join('/') }
                             key={i}
                             />)
                         : <p className='info_no_files'>No files found</p>}

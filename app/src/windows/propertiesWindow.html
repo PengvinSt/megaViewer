@@ -23,11 +23,14 @@
                 <input type="text" placeholder="" id="name_input">
             </div>
             <div class="file_size_container">
-                <div class="file_size_repr">
-                    2%
+                <!-- <div class="file_size_repr">
+                    <p id="file_size_repr">...</p>
+                </div> -->
+                <div id="file_size_repr">
+                   <p id="file_size_repr_inner">...</p>
                 </div>
                 <div class="file_size_text">
-                    <p id="size"></p>
+                    <p id="size">...</p>
                     <p id="folders_count"></p>
                     <p id="files_count"></p>
                 </div>
@@ -36,10 +39,14 @@
                 <div class="name_of_info">
                     <p>Type:</p>
                     <p>Location:</p>
+                    <p id="DateC_key">Date(C):</p>
+                    <p id="DateM_key">Date(M):</p>
                 </div>
                 <div class="info">
                     <p id="type"></p>
-                    <p id="path"></p>
+                    <input id="path"/>
+                    <p id="DateC"></p>
+                    <p id="DateM"></p>
                 </div>
             </div>
         </div>

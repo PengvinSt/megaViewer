@@ -16,8 +16,15 @@ const closePropWindow = () => ipcRenderer.send('closePropWindow')
 
 const getWindowData = ()=> ipcRenderer.invoke('getWindowData')
 
+const getFilesName = (path)=> ipcRenderer.invoke('getFilesName', path)
+const getFolderSize = (path)=> ipcRenderer.invoke('getFolderSize', path)
+const getMoreInfo = (path)=> ipcRenderer.invoke('getMoreInfo', path)
+
 
 contextBridge.exposeInMainWorld('api',{
+    getFilesName,
+    getMoreInfo,
+    getFolderSize,
     getCurrentFilePath,
     spawnPropertiesWindow,
     getDiskSpace,

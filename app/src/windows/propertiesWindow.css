@@ -140,17 +140,7 @@ button {
     gap:15px;
     margin-left: 10px;
 }
-.file_size_repr {
-    width: 70px;
-    height: 70px;
-    border-radius:100%;
-    font-size: 16px;
-    border:2px solid var(--window-fill-indicator-empty);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-}
+
 .file_size_text {
     display: flex;
     flex-direction: column;
@@ -166,11 +156,42 @@ button {
 .name_of_info {
     display: flex;
     flex-direction: column;
-    gap:20px;
+    gap:10px;
 }
 
 .info {
     display: flex;
     flex-direction: column;
-    gap:20px;
+    gap:10px;
 }
+.name_of_info p, .info p {
+    height: 25px;
+    display: flex;
+    align-items: center;
+}
+#path {
+    height: 25px;
+    width: 190px;
+    outline: none;
+    border: none;
+    background: #000;
+    padding:0 0 3px 8px;
+    color:var(--window-main-font-color);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 14px;
+    border-radius: 3px;
+}
+
+#file_size_repr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: 
+      radial-gradient(closest-side,  var(--window-main-background-color) 80%, transparent 85% 100%),
+      conic-gradient(var(--window-fill-indicator-filled) 0%, var(--window-fill-indicator-empty) 0);    
+}
+  

@@ -1,12 +1,16 @@
 const { app,screen, BrowserWindow, Menu, ipcMain } = require('electron'); 
-const { readdir, readdirSync } = require('fs');
+const { readdirSync } = require('fs');
 const path = require('path')
-const checkDiskSpace = require('check-disk-space').default
+
 const lock = app.requestSingleInstanceLock()
 const isDevelopment = process.env.NODE_ENV === "development";
 const drivelist = require('drivelist');
 
+
 const fs = require("fs")
+const { promisify } = require('util')
+const fastFolderSize = require('fast-folder-size')
+const fastFolderSizeAsync = promisify(fastFolderSize)
 
 if(!lock){
     app.quit()
@@ -78,16 +82,41 @@ const getFileStats = async (path) => {
     }
 }
 
+ipcMain.handle('getFilesName', async (_, path)=>{
+    const fixedPath = `${path}\\`
+    let rawData = await fs.promises.readdir(fixedPath,{withFileTypes: true})
+    let files = rawData.map(file=>{
+        return {
+            name: file.name,
+            path:fixedPath + file.name,
+            type: file.isDirectory() ? "Folder" : "File",
+        }
+    })
+    // console.log(files.length)
+    return files
+})
+
 ipcMain.handle('getFilesFromPath', async (_, path)=>{
     const fixedPath = `${path}\\`
     let rawData = readdirSync(fixedPath,{withFileTypes: true})
     const promiseResults = await Promise.allSettled(rawData.map(async (file) =>{
         const Stats = await getFileStats(fixedPath + file.name)
-        return {
-            name: file.name,
-            type: file.isDirectory() ? "Folder" : "File",
-            Stats
+        if(file.isDirectory()){
+            const thisDirFiles = await fs.promises.readdir(fixedPath+file.name);
+            return {
+                name: file.name,
+                type: "Folder",
+                isEmpty:thisDirFiles.length > 0 ? false : true,
+                Stats
+            }
+        }else {
+            return {
+                name: file.name,
+                type: "File",
+                Stats
+            }
         }
+        
     }))
     const results = []
     const errors = []
@@ -106,7 +135,15 @@ ipcMain.handle('getFilesFromPath', async (_, path)=>{
 
 ipcMain.handle('getDiskSpace', async (_, path)=>{
     if (process.platform == 'win32') { // Run wmic for Windows.
-        const diskInfo = await checkDiskSpace(path)
+        // const diskInfo = await checkDiskSpace(path)
+        const data = await fs.promises.statfs(path)
+        const diskInfo = {
+            diskPath:path.split(':')[0]+':',
+            free:data.bsize*data.bfree,
+            size:data.bsize*data.blocks
+        }
+        // console.log('Total free space',data.bsize*data.bfree);
+        // console.log('Available for user',data.bsize*data.blocks);
         return diskInfo
 
     } else if (process.platform == 'linux') { // Run df for Linux.
@@ -116,6 +153,31 @@ ipcMain.handle('getDiskSpace', async (_, path)=>{
     }
 })
 
+
+ipcMain.handle('getFolderSize', async (_, path) => {
+    const size = await fastFolderSizeAsync(path)
+    return size
+})
+
+ipcMain.handle('getMoreInfo', async(_,path)=> {
+    const rawData = await fs.promises.stat(path)
+    if(rawData.isDirectory()){
+        const data = {
+            type:'Folder',
+            dateC: rawData.birthtime,
+            dateM: rawData.mtime,
+        }
+        return data
+    }else {
+        const data = {
+            type:'File',
+            dateC: rawData.birthtime,
+            dateM: rawData.mtime,
+            size: rawData.size
+        }
+        return data
+    }
+})
 
 const createMainWindow = () =>{
     const {width, height} = screen.getPrimaryDisplay().size

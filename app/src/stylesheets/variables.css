@@ -24,6 +24,7 @@
     --offlineExplorer-main-button-background-color:#494a4b;
     --offlineExplorer-main-button-background-color-hover:#515253;
     --offlineExplorer-main-button-font-color-hover:#24acf2;
+    --offlineExplorer-main-button-image-color-svg:invert(100%) sepia(4%) saturate(119%) hue-rotate(125deg) brightness(116%) contrast(87%);
     --offlineExplorer-main-button-image-hover-color-svg:invert(61%) sepia(39%) saturate(4561%) hue-rotate(171deg) brightness(101%) contrast(90%);
     
     /* see more https://codepen.io/philcheng/pen/YWyYwG?editors=1100 */

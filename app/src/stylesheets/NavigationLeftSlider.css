@@ -1,0 +1,103 @@
+/* NAV BAR LEFT */
+
+.navigation_and_settings_container {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    /* border: 1px solid red; */
+}
+
+
+/* Nav container */
+
+.navigation_containter {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap:10px;
+    /* border: 1px solid red; */
+}
+
+.search_container {
+    width: 100%;
+    height: 40px;
+    /* border: 1px solid red; */
+}
+
+.pinned_container {
+    width: 100%;
+    /* border: 1px solid red; */
+}
+
+.accordion_header_text {
+    display: flex;
+    align-items: center;
+    gap:10px;
+    font-size: 16px;
+}
+.accordion_header_text img {
+    width: 25px;
+    height: 25px;
+}
+
+
+.arrows_min_down,.arrows_min_up {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    filter: var(--offlineExplorer-main-button-image-color-svg);
+}
+
+.arrows_min_down:hover {
+    filter: var(--offlineExplorer-main-button-image-hover-color-svg);
+}
+
+.arrows_min_up {
+    filter: var(--offlineExplorer-main-button-image-hover-color-svg);
+}
+.accordion_inner_item_p,.accordion_inner_item_p_active {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    font-size: 16px;
+}
+
+.accordion_inner_item_p_active {
+    background-color: var(--offlineExplorer-main-button-background-color-hover);
+}
+
+.accordion_inner_item_p:hover,.thisPc_accordion_button:hover {
+    background-color: var(--offlineExplorer-main-button-background-color-hover);
+}
+
+
+.tabs_nav_container {
+    width: 100%;
+    height: 70%;
+    /* border: 1px solid red; */
+    box-sizing: border-box;
+}
+
+.thisPc_accordion_button {
+    border: none;
+    width: 100%;
+    background-color: var(--offlineExplorer-main-background-color);
+    color:var(--offlineExplorer-main-font-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 5px;
+    /* border: 1px solid red; */
+}
+
+.settings_containter {
+    width: 100%;
+    height: 10%;
+    /* border: 1px solid red; */
+}
