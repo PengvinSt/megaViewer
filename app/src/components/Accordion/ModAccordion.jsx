@@ -8,7 +8,7 @@ import { usePathStore } from '../../states/FileState'
 export default function ModAccordion({path, visible}) {
     const [files, setFiles] = useState([])
     const [isVisibleModAccordion,setIsVisibleModAccordion] = useState([])
-    const rootClasses = [classes.accordion]
+    const rootClasses = [classes.mod_accordion]
 
      // STATE
      const pathState = usePathStore((state)=> state.path)
@@ -16,10 +16,11 @@ export default function ModAccordion({path, visible}) {
      // STATE
 
     const getFilesName = async () => {
-        const filesData = await window.api.getFilesName(path)
-        setFiles([...filesData])
+        const filesDataRaw = await window.api.getFilesName(path)
+        const filesDataFiltered = filesDataRaw.filter(file => file.type === 'Folder')
+        setFiles([...filesDataFiltered])
         let isVisible = []
-        for(let i = 0; i < filesData.length; i++) {
+        for(let i = 0; i < filesDataFiltered.length; i++) {
             isVisible.push(false)
         }
         setIsVisibleModAccordion([...isVisible])
@@ -34,28 +35,20 @@ export default function ModAccordion({path, visible}) {
   return (
     files.length > 0 
     ? files.map((file,i) =>
-        file.type === 'Folder' 
-            ?<div key={i} className={rootClasses.join(' ')} >
-                <div className={pathState === file.path ? 'accordion_inner_item_p_active' : 'accordion_inner_item_p'} key={i} >
-                    <span className='accordion_header_text'>
-                        <img src={Folder} alt="folder representation" /> 
-                        <p onClick={()=> setPathState(file.path)}>{file.name}</p>
-                    </span>
-                    <img 
-                    onClick={()=> setIsVisibleModAccordion(Object.assign(Array.from(isVisibleModAccordion), { [i]: !isVisibleModAccordion[i] }))}
-                    className={isVisibleModAccordion[i] ?'arrows_min_up' : 'arrows_min_down' } src={isVisibleModAccordion[i] ? UpArrowMin : DownArrowMin} alt="arrow min" />
-                </div>
-                {isVisibleModAccordion[i] ? <ModAccordion path={file.path} visible={isVisibleModAccordion[i]}/> : null}
-            </div>
-            :<div key={i} className={rootClasses.join(' ')}>
-                <div className='accordion_inner_item_p'>
+      <div key={i} className={rootClasses.join(' ')} >
+            <div className={pathState === file.path ? 'accordion_inner_item_p_active' : 'accordion_inner_item_p'} key={i} >
+                <img 
+                onClick={()=> setIsVisibleModAccordion(Object.assign(Array.from(isVisibleModAccordion), { [i]: !isVisibleModAccordion[i] }))}
+                className={isVisibleModAccordion[i] ?'arrows_min_up' : 'arrows_min_down' } src={isVisibleModAccordion[i] ? UpArrowMin : DownArrowMin} alt="arrow min" 
+                />
                 <span className='accordion_header_text'>
-                    <div className="file-icon file-icon-sm-mod" data-type={file.name.split('.').slice(-1)[0].length >4 ? '?' : file.name.split('.').slice(-1)[0]}></div>
-                    <p onClick={()=> console.log(file.path.split('\\').slice(-1).join('\\'))}>{file.name}</p>
+                    <img src={Folder} alt="folder representation" /> 
+                    <p onClick={()=> setPathState(file.path)}>{file.name.length < 30 ? file.name : file.name.slice(0, 30) + '...'}</p>
                 </span>
-                </div>   
             </div>
-        )
-    :<p className={rootClasses.join(' ')}>No files in directory</p>
+            {isVisibleModAccordion[i] ? <ModAccordion path={file.path} visible={isVisibleModAccordion[i]}/> : null}
+        </div>
+    )
+    :<p className={rootClasses.join(' ')}>...</p>
   )
 }

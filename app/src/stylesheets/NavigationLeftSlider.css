@@ -1,6 +1,7 @@
 /* NAV BAR LEFT */
 
 .navigation_and_settings_container {
+    height: 100%;
     width: 20%;
     display: flex;
     flex-direction: column;
@@ -13,41 +14,132 @@
 /* Nav container */
 
 .navigation_containter {
-    width: 100%;
-    height: 80%;
+    width: 99%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap:10px;
+    justify-content: center;
     /* border: 1px solid red; */
 }
 
 .search_container {
-    width: 100%;
-    height: 40px;
+    margin-top: 5px;
+    width: 98%;
+    height: 37px;
+    margin-left: 5px;
     /* border: 1px solid red; */
+    display: flex;
+    position: relative;
+}
+.search_container img {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    filter: var(--offlineExplorer-not-interractive-svg);
+}
+.search_container img:hover {
+    filter: var(--offlineExplorer-main-button-image-hover-color-svg);
+}
+
+.pin_icon_in_pinnedPath {
+    filter: var(--offlineExplorer-main-button-image-color-svg);
+}
+.pin_icon_in_pinnedPath:hover {
+    filter: var(--offlineExplorer-main-button-image-hover-color-svg);
+}
+
+.search_container input  {
+    transition: ease-in-out 0.2s;
+    width: 100%;
+    padding-left: 5px;
+    height: 35px;
+    border: none;
+    border-bottom: 1px solid var(--offlineExplorer-main-input-border-color);
+    outline: none;
+    background: var(--offlineExplorer-main-input-background-color);
+    color:var(--offlineExplorer-main-font-color);
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.search_container input:focus {
+    transition: ease-in-out 0.2s;
+    border-bottom: 2px solid var(--offlineExplorer-main-input-border-color-hover);
 }
 
 .pinned_container {
     width: 100%;
     /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    gap:5px;
+}
+.pinned_container_body {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+    gap:5px;
+}
+.pinned_container_header {
+    width: 98%;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-top: 5px;
+    background-color: var(--offlineExplorer-main-container-notselected-background-color);
+    color:var(--offlineExplorer-main-font-color);
+    display: flex;
+    align-items: center;
+    gap:10px;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 16px;
 }
 
-.accordion_header_text {
+.pinnedPath {
+    width: 98%;
+    border-radius: 5px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap:10px;
     font-size: 16px;
+    padding: 5px 0 5px 5px;
+    /* border:1px solid blueviolet; */
+}
+.pinnedPath img {
+    width: 20px;
+    height: 20px;
+}
+
+.accordion_header_text,.accordion_header_text_ThisPC {
+    display: flex;
+    align-items: center;
+    gap:10px;
+    font-size: 16px;
+    /* border:1px solid blueviolet; */
+}
+.accordion_header_text p, .accordion_header_text_ThisPC p {
+    /* border:1px solid blueviolet; */
+    height: 35px;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
 }
 .accordion_header_text img {
+    width: 15px;
+    height: 15px;
+}
+.accordion_header_text_ThisPC img, .tabs_disk_img {
     width: 25px;
     height: 25px;
 }
 
-
 .arrows_min_down,.arrows_min_up {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     cursor: pointer;
     filter: var(--offlineExplorer-main-button-image-color-svg);
 }
@@ -60,37 +152,43 @@
     filter: var(--offlineExplorer-main-button-image-hover-color-svg);
 }
 .accordion_inner_item_p,.accordion_inner_item_p_active {
+    /* border:1px solid blueviolet; */
+    border-radius: 5px;
+    width: 94%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap:10px;
     padding: 5px;
     font-size: 16px;
+    margin-left: 15px;
 }
 
 .accordion_inner_item_p_active {
     background-color: var(--offlineExplorer-main-button-background-color-hover);
 }
 
-.accordion_inner_item_p:hover,.thisPc_accordion_button:hover {
+.accordion_inner_item_p:hover,.thisPc_accordion_button:hover, .pinnedPath:hover, .pinned_container_header:hover {
     background-color: var(--offlineExplorer-main-button-background-color-hover);
 }
 
 
 .tabs_nav_container {
     width: 100%;
-    height: 70%;
-    /* border: 1px solid red; */
+    height: 100%;
+    /* border: 1px solid green; */
     box-sizing: border-box;
 }
 
 .thisPc_accordion_button {
     border: none;
-    width: 100%;
-    background-color: var(--offlineExplorer-main-background-color);
+    margin-left: 5px;
+    width: 98%;
+    background-color: var(--offlineExplorer-main-container-notselected-background-color);
+    border-radius: 5px;
     color:var(--offlineExplorer-main-font-color);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap:10px;
     cursor: pointer;
     padding: 5px;
     /* border: 1px solid red; */
@@ -98,6 +196,6 @@
 
 .settings_containter {
     width: 100%;
-    height: 10%;
+    height: 45px;
     /* border: 1px solid red; */
 }

@@ -27,11 +27,33 @@ import GroupSpred from 'Images/group_spred.svg'
 
 import OfflineSpredFile from './OfflineSpredFile.jsx';
 import { usePathStore } from '../../states/FileState.js';
+import { useSettingsStore } from '../../states/SettingState.js';
 
 
 
 
 export default function FolderContentField() {
+
+    // STATE
+    const pathState = usePathStore((state)=> state.path)
+    const setPathState = usePathStore((state)=> state.setPath)
+
+    const setCurrentPath = usePathStore((state)=> state.setCurrentPath)
+
+    const innerSettingsState = useSettingsStore((state)=> state.innerSetting)
+    const setInnerSettingsState = useSettingsStore((state)=> state.setInnerSetting)
+    // STATE
+    useEffect(()=>{
+        console.log(innerSettingsState)
+        if(innerSettingsState.visual !== undefined){
+            setShowType(innerSettingsState.visual.showType)
+            setSortType(innerSettingsState.visual.sortingType)
+            setIsSorting(innerSettingsState.visual.isSorting)
+        }
+    }, [innerSettingsState.visual])
+
+    
+
     const [files, setFiles] = useState([])
     const [directory, setDirectory] = useState('')
     const [coreDir, setCoreDir] = useState([])
@@ -39,7 +61,6 @@ export default function FolderContentField() {
     const [prevDirectory, setPrevDirectory] = useState('')
     const [nextDirectory, setNextDirectory] = useState('')
 
-    
     const [showType, setShowType] = useState('in-line')
     const [sortType, setSortType] = useState('')
     const [isSorting, setIsSorting] = useState(false)
@@ -51,10 +72,7 @@ export default function FolderContentField() {
     const [modalView, setModalView] = useState(false)
     const [modalSort, setModalSort] = useState(false)
     
-    // STATE
-    const pathState = usePathStore((state)=> state.path)
-    const setPathState = usePathStore((state)=> state.setPath)
-    // STATE
+    
     
 
     const refreshFiles = async (path) => {
@@ -74,6 +92,7 @@ export default function FolderContentField() {
          //temp REDO!!!
          setPrevDirectory(directory)
          setDirectory(pathState)
+         setCurrentPath(pathState)
     }
 
     const goToNextFolder = async (file) =>{
@@ -96,6 +115,7 @@ export default function FolderContentField() {
                 // setFiles([...resFilteredFiles])
                 setPrevDirectory(directory)
                 setDirectory(`${directory}\\${file.name}`)
+                setCurrentPath(`${directory}\\${file.name}`)
             }else {
                 throw new Error({message:'Not a folder'})
             }
@@ -115,6 +135,7 @@ export default function FolderContentField() {
 
             setNextDirectory(directory)
             setDirectory(getPrevDirectory(directory,path))
+            setCurrentPath(getPrevDirectory(directory,path))
             // setFiles([...resFilteredFiles])
             
             //temp REDO!!!
@@ -190,6 +211,7 @@ export default function FolderContentField() {
 
             setNextDirectory(directory)
             setDirectory(prevDirectory)
+            setCurrentPath(prevDirectory)
             setPrevDirectory('')
         }
     }
@@ -215,6 +237,7 @@ export default function FolderContentField() {
 
             setPrevDirectory(directory)
             setDirectory(nextDirectory)
+            setCurrentPath(nextDirectory)
             setNextDirectory('')
         }
     }
@@ -229,6 +252,7 @@ export default function FolderContentField() {
             }
             setFiles([])
             setDirectory('')
+            setCurrentPath('')
             setCoreDir([...path])
             setPathState('')
         } catch (error) {
@@ -246,6 +270,7 @@ export default function FolderContentField() {
 
                 setCoreDir([])
                 setDirectory(path)
+                setCurrentPath(path)
                 // setFiles([...resFilteredFiles])
 
                 //temp REDO!!!
@@ -265,6 +290,7 @@ export default function FolderContentField() {
 
                 setCoreDir([])
                 setDirectory(path)
+                setCurrentPath(path)
                 // setFiles([...resFilteredFiles])
 
                 //temp REDO!!!
@@ -393,7 +419,7 @@ export default function FolderContentField() {
         }
     }
 
-    const isAppear =(array, find,isObject=false, keyName) => {
+    const isAppear = (array, find,isObject=false, keyName) => {
         let count = 0;
         
         if(isObject){
@@ -415,8 +441,7 @@ export default function FolderContentField() {
                 name:directory.split('\\').slice(-1)[0],
                 path:directory,
                 type:directory.length > 4 ? rawData.type : 'Disk',
-                foldersCount:rawData.type !== 'File' ? isAppear(files,'Folder',true,"type") : null,
-                filesCount:rawData.type !== 'File' ? isAppear(files,'File',true,"type") : null,
+                _uid:Date.now()+ Math.floor(Math.random() * 100),
                 size:rawData.type === 'File' && rawData.size,
                 diskSize:  await getDiskSize(directory.split(':')[0]),
                 dateC:directory.length > 4 ? rawData.dateC.toISOString().split('T')[0] : null,
@@ -438,8 +463,11 @@ export default function FolderContentField() {
         if(pathState !== ''){
             if(pathState === 'Drive'){
                 getStartingPath()
+                setPathState('')
             }else {
+                // console.log(pathState)
                 refreshFiles(pathState)
+                setPathState('')
             }
         }
     },[pathState])
@@ -471,7 +499,7 @@ export default function FolderContentField() {
                         }
                       </div>
                     : <>
-                        <h1>{directory.split('\\').slice(-1)[0].length > 20 ? directory.split('\\').slice(-1)[0].slice(0,20)+`...` : directory.split('\\').slice(-1)[0]}</h1>
+                        <h1>{directory.split('\\').slice(-1)[0].length > 25 ? directory.split('\\').slice(-1)[0].slice(0,25)+`...` : directory.split('\\').slice(-1)[0]}</h1>
                         <div className='intaractive_path_inner_div'>
                         {directory.split('\\').length < 4 
                             ? directory.split('\\').map((path, i)=>
@@ -481,8 +509,8 @@ export default function FolderContentField() {
                                         <p onClick={()=>goToPrevFolder(path)}>
                                             <img src={dividerArrow} alt="divide_arrow" />
                                             {i+1 === directory.split('\\').length 
-                                            ? path.length > 25 ? path.slice(0,10)+`...` : path
-                                            : path.length > 10 ? path.slice(0,5)+`...` : path
+                                            ? path.length > 25 ? path.slice(0,25)+`...` : path
+                                            : path.length > 10 ? path.slice(0,10)+`...` : path
                                             }
                                         </p>)
                             :<>

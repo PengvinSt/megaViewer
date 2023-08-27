@@ -16,7 +16,7 @@ const sizeCircleBorder = document.getElementById('file_size_repr')
 const sizeCircle = document.getElementById('file_size_repr_inner')
 
 closeButton.addEventListener('click', () =>{
-    window.api.closePropWindow()
+    window.api.closePropWindow(propData._uid)
 })
 
 function formatBytes(bytes, decimals = 2) {
@@ -31,15 +31,18 @@ function formatBytes(bytes, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
+let propData = {}
+
 document.addEventListener('DOMContentLoaded', async ()=>{
     const data = await window.api.getWindowData()
+    propData = data
     console.log(data)
 
     if(data.name){
         nameHolderAndInput.placeholder = data.name
     }
     
-    pathHolder.value = data.path
+    pathHolder.value = data.path.replace('\\\\', '\\')
     typeHolder.innerHTML = data.type
 
     if(data.type === 'Disk'){
@@ -50,15 +53,12 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         DateMKey.hidden = true
     }
     if(data.type === 'Folder'){
-        fileCountHolder.innerHTML = `${data.filesCount} files`
-        folderCountHolder.innerHTML = `${data.foldersCount} folders`
         DateCHolder.innerHTML = data.dateC
         DateMHolder.innerHTML= data.dateM
-        const size = await window.api.getFolderSize(data.path)
-        sizeHolder.innerHTML = `Folder size ${formatBytes(size)}`
-        sizeCircle.innerHTML = `${(100-(((data.diskSize-size)/data.diskSize)*100)).toFixed(2) < 0.01 ? '>0.01' : (100-(((data.diskSize-size)/data.diskSize)*100)).toFixed(2)}%`
-        sizeCircleBorder.style.background = `radial-gradient(closest-side,  var(--window-main-background-color) 80%, transparent 85% 100%),
-        conic-gradient(var(--window-fill-indicator-filled) ${(100-(((data.diskSize-size)/data.diskSize)*100)).toFixed(2) < 0.01 ? '0.05%' : (100-(((data.diskSize-size)/data.diskSize)*100)).toFixed(2)+'%'}, var(--window-fill-indicator-empty) 0)`
+        window.api.getFolderSize({
+            path:data.path,
+            uid:data._uid
+        })
     }
     if(data.type === 'File'){
         DateCHolder.innerHTML = data.dateC
@@ -69,4 +69,23 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         conic-gradient(var(--window-fill-indicator-filled) ${(100-(((data.diskSize-data.size)/data.diskSize)*100)).toFixed(2) < 0.01 ? '0.05%' : (100-(((data.diskSize-data.size)/data.diskSize)*100)).toFixed(2)+'%'}, var(--window-fill-indicator-empty) 0)`
     }
     
+})
+
+
+window.api.updateDirSize((_, data)=>{
+    sizeHolder.innerHTML = `Folder size ${formatBytes(data.size)}`
+    fileCountHolder.innerHTML = `${data.files} files`
+    folderCountHolder.innerHTML = `${data.folders} folders`
+    sizeCircle.innerHTML = `${(100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2) < 0.01 ? '>0.01' : (100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2)}%`
+    sizeCircleBorder.style.background = `radial-gradient(closest-side,  var(--window-main-background-color) 80%, transparent 85% 100%),
+    conic-gradient(var(--window-fill-indicator-filled) ${(100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2) < 0.01 ? '0.05%' : (100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2)+'%'}, var(--window-fill-indicator-empty) 0)`
+})
+window.api.updateFinalDirSize((_, data)=>{
+    console.log(data)
+    sizeHolder.innerHTML = `Folder size ${formatBytes(data.size)}`
+    fileCountHolder.innerHTML = `${data.files} files`
+    folderCountHolder.innerHTML = `${data.folders} folders`
+    sizeCircle.innerHTML = `${(100-(((propData.diskSize-size)/propData.diskSize)*100)).toFixed(2) < 0.01 ? '>0.01' : (100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2)}%`
+    sizeCircleBorder.style.background = `radial-gradient(closest-side,  var(--window-main-background-color) 80%, transparent 85% 100%),
+    conic-gradient(var(--window-fill-indicator-filled) ${(100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2) < 0.01 ? '0.05%' : (100-(((propData.diskSize-data.size)/propData.diskSize)*100)).toFixed(2)+'%'}, var(--window-fill-indicator-empty) 0)`
 })

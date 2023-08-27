@@ -124,7 +124,7 @@ button {
     border-radius: 3px;
     background: #000;
     border: none;
-    border-bottom: 1px solid #60CDFF;
+    border-bottom: 1px solid var(--window-main-border-color);
     padding:0 0 3px 8px;
     color:var(--window-main-font-color);
     font-size: 16px;

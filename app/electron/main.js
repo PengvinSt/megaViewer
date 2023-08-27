@@ -1,4 +1,4 @@
-const { app,screen, BrowserWindow, Menu, ipcMain } = require('electron'); 
+const { app,screen, BrowserWindow, Menu, ipcMain, webContents } = require('electron'); 
 const { readdirSync } = require('fs');
 const path = require('path')
 
@@ -8,17 +8,18 @@ const drivelist = require('drivelist');
 
 
 const fs = require("fs")
-const { promisify } = require('util')
-const fastFolderSize = require('fast-folder-size')
-const fastFolderSizeAsync = promisify(fastFolderSize)
+const {Worker} = require('worker_threads')
+
 
 if(!lock){
+    
     app.quit()
 }else{
     app.on('second-instance',()=>{
     app.focus()
     })
 }
+
 // deprecated --------------------------------
 ipcMain.handle('getCurrentFilePath', ()=>{
     const path = app.getAppPath()
@@ -33,8 +34,8 @@ ipcMain.handle('getStartingPath', async ()=>{
 
 
 
-ipcMain.on('spawnPropertiesWindow', (_, data)=>{
-    if(data.path !== undefined){
+ipcMain.handle('spawnPropertiesWindow', (_, mainData)=>{
+    if(mainData.path !== undefined){
         let window = new BrowserWindow({
             backgroundColor:"#191919",
             width: 350,
@@ -61,14 +62,58 @@ ipcMain.on('spawnPropertiesWindow', (_, data)=>{
         })       
         
         ipcMain.handle('getWindowData', ()=>{
-            return data
+            ipcMain.removeHandler('getWindowData')
+            return mainData
         })
         
-        ipcMain.on('closePropWindow', ()=>{
-            window.destroy()
-            ipcMain.removeHandler('getWindowData')
+        ipcMain.on('closePropWindow', (_, uid)=>{
+            if(mainData._uid === uid){
+                window.destroy()
+                ipcMain.removeHandler('getFolderSize')
+            }
         })
 
+        let allSize = 0
+        let allFiles = 0
+        let allFolders = 0
+        const getDirSize = async (dirPath) => {
+            let size = 0
+            const files = await fs.promises.readdir(dirPath)
+          
+            for (let i = 0; i < files.length; i++) {
+              const filePath = path.join(dirPath, files[i])
+              const stats = await fs.promises.stat(filePath)
+               
+              if (stats.isFile()) {
+                size += stats.size
+                allSize += stats.size
+                allFiles += 1
+                window.webContents.send('updateDirSize', {
+                    size: allSize,
+                    folders: allFolders,
+                    files: allFiles
+                })
+              } else if (stats.isDirectory()) {
+                // const worker = new Worker(path.join(__dirname + '/workers/folderSizeWorker.js'))
+                // worker.on('message', (data)=>console.log(data))
+                allFolders += 1
+                size += await getDirSize(filePath)
+              }
+              
+            }
+            return size;
+        }
+        ipcMain.on('getFolderSize', async (_, data) => {
+            if(mainData._uid === data.uid){
+            const size = await getDirSize(data.path)
+            const dataSend = {
+                size,
+                folders: allFolders,
+                files: allFiles
+            }
+            window.webContents.send('updateFinalDirSize', dataSend)
+            }
+        })
     }
 })
 
@@ -154,10 +199,9 @@ ipcMain.handle('getDiskSpace', async (_, path)=>{
 })
 
 
-ipcMain.handle('getFolderSize', async (_, path) => {
-    const size = await fastFolderSizeAsync(path)
-    return size
-})
+
+
+
 
 ipcMain.handle('getMoreInfo', async(_,path)=> {
     const rawData = await fs.promises.stat(path)
@@ -180,12 +224,13 @@ ipcMain.handle('getMoreInfo', async(_,path)=> {
 })
 
 const createMainWindow = () =>{
+    let innerSettings = JSON.parse(fs.readFileSync(path.join(__dirname, '/innerSettings.json'),"utf8"))
+    console.log(innerSettings)
     const {width, height} = screen.getPrimaryDisplay().size
-
     let window = new BrowserWindow({
         backgroundColor:"#1C2321",
-        width: 800,
-        height: 600,
+        width: innerSettings.window.windowSize.width,
+        height: innerSettings.window.windowSize.height,
         minWidth:720,
         minHeight:600,
         maxHeight:height,
@@ -197,9 +242,13 @@ const createMainWindow = () =>{
             preload: path.join(__dirname, 'preload.js')
         }
     })
+    ipcMain.handle('innerSettings', ()=>{
+        return innerSettings
+    })
     
-    
+
     window.webContents.on('did-finish-load', ()=>{
+        
         window.show()
         // window.focus()
     })
@@ -216,6 +265,60 @@ const createMainWindow = () =>{
     } else {
         window.loadFile("app/dist/index.html");
     }
+
+    ipcMain.handle('findFile', async (_, data) => {
+        let allFindFiles = []
+        const findFile = async (data) => {
+            const pathFind = data.path.length <3 ? data.path + '\\' : data.path
+            let files = await fs.promises.readdir(pathFind, {withFileTypes: true})
+            console.log(files)
+            files = files.filter(file => file.name !== 'System Volume Information' && file.name !== 'WindowsApps' && file.name !== '$Recycle.Bin' && file.name !== 'MSOCache')
+            console.log('Searchiing in:', pathFind)
+            for (let i = 0; i < files.length; i++) {
+              const filePath = path.join(pathFind, files[i].name)  
+              if(files[i].name.toLowerCase().includes(data.searhFile.toLowerCase())){
+                allFindFiles.push({
+                    name: files[i].name,
+                    path: filePath,
+                    type:files[i].isDirectory() ? "Directory" : "File"
+                })
+                window.webContents.send('updateFindFiles', allFindFiles)
+              }
+              if(files[i].isDirectory()){
+                try{
+                    await findFile({path:filePath, searhFile:data.searhFile})
+                }catch(error){
+                    console.log(error)
+                }
+              }
+            }
+        }
+        await findFile(data)
+        
+        return allFindFiles
+    })
+    ipcMain.on('stopFindFile', async (_, data) => {
+        ipcMain.removeHandler('findFile')
+    })
+    ipcMain.on('openTerminal', (_, data)=>{
+        const child_process = require('child_process')
+        let editor = process.env.EDITOR || 'vi';
+
+        let child = child_process.spawn(editor, [data.path], {
+            stdio: 'inherit'
+        });
+    })
+    ipcMain.on('updateInnerSettings', (_, data) => {
+        fs.writeFileSync(path.join(__dirname, '/innerSettings.json'),JSON.stringify(data.newInnerSettings))
+        innerSettings = data.newInnerSettings
+    })
+
+    window.on('close', ()=>{
+        const size = window.getSize()
+        innerSettings.window.windowSize.width = size[0]
+        innerSettings.window.windowSize.height = size[1]
+        fs.writeFileSync(path.join(__dirname, '/innerSettings.json'),JSON.stringify(innerSettings))
+    })
 }
 
 app.on('ready', createMainWindow)
