@@ -7,7 +7,7 @@ import { Scrollbar } from 'react-scrollbars-custom';
 import { usePathStore } from '../../states/FileState'
 import { useSettingsStore } from '../../states/SettingState'
 
-import PC from 'Images/pc_icon.png'
+import PC from 'Images/thisPC_outline_icon.svg'
 import UpArrowMin from 'Images/up_arrow_min.svg'
 import DownArrowMin from 'Images/down_arrow-min.svg'
 import Folder from 'Images/folder.png'
@@ -15,6 +15,8 @@ import hardDiskImg from 'Images/hard_disk.png'
 import SystemDiskImg from 'Images/systemDisk.png'
 import Search from 'Images/search_icon.svg'
 import Pin from 'Images/pin_icon.svg'
+import Settings from 'Images/settings_icon.svg'
+import SearchResult from 'Images/folder_search_result_icon.svg'
 
 export default function NavigationLeftSlider() {
 
@@ -52,8 +54,8 @@ export default function NavigationLeftSlider() {
     }, [currentPath])
 
     const getStartingPath = async ()=>{
-      const drive = await window.api.getStartingPath()
-      const path = []
+      const {drive} = await window.api.getStartingPath()
+      let path = []
       for(let i = 0; i < drive.length; i++){
         drive[i].mountpoints.map(drive => path.push(drive.path))
       }
@@ -100,10 +102,6 @@ export default function NavigationLeftSlider() {
 
     useEffect(()=>{
       getStartingPath()
-      window.api.updateFindFiles((_,data)=>{
-        setSearchResult([...data])
-        console.log(data)
-      })
     },[])
   return (
     <div className="navigation_and_settings_container">
@@ -115,7 +113,8 @@ export default function NavigationLeftSlider() {
                 <div className="pinned_container">
                   <p className="pinned_container_header" onClick={()=> setPinVisible(!pinVisible)}>
                   <img className={pinVisible ?'arrows_min_up' : 'arrows_min_down' } src={pinVisible ? UpArrowMin : DownArrowMin} alt="arrow min" />
-                    Pinned
+                  <img className='pinn_represeintation' src={Pin} alt="pin icon"/>
+                  Pinned
                   </p>
                   <div className="pinned_container_body">
                   {pinnedPath.length > 0 && <Accordion visible={pinVisible}>
@@ -123,7 +122,7 @@ export default function NavigationLeftSlider() {
                       <p key={i} className='pinnedPath' >
                         <img className='pin_icon_in_pinnedPath' src={Pin} alt="pin icon" onClick={()=> unPinFolder(data)}/>
                         <img src={Folder} alt="folder representation" onClick={()=> setPathState(data.path)}/> 
-                        <span onClick={()=> setPathState(data.path)}>{data.name}</span>
+                        <span onClick={()=> setPathState(data.path)}>{data.name.length>20?data.name.slice(0,20)+'...':data.name}</span>
                       </p>
                   )}
                   </Accordion>}
@@ -133,7 +132,7 @@ export default function NavigationLeftSlider() {
                   <button className='thisPc_accordion_button' >
                   <img className={navVisible ?'arrows_min_up' : 'arrows_min_down' } src={navVisible ? UpArrowMin : DownArrowMin} alt="arrow min" onClick={()=> setIsNavVisible(!navVisible)}/>
                   <span className='accordion_header_text_ThisPC' onClick={()=> setPathState('Drive')}>
-                    <img src={PC} alt="folder representation" /> This PC
+                    <img src={PC} alt="folder representation" className='thisPC_image'/> This PC
                   </span>
                   </button>
                     <Scrollbar style={{ width: "100%", height: "92%"}} noScrollX>
@@ -159,21 +158,8 @@ export default function NavigationLeftSlider() {
                 </div>
             </div>
             <div className="settings_containter">
-            {searchResult.length > 0 &&
-                <div className="search_result_container">
-                <button onClick={()=> setSearchVisible(!searchVisible)}>Search result</button>
-                <Accordion visible={searchVisible}>
-                 {searchResult.map(result =>
-                  <>
-                   <p>{result.name}</p>
-                   <p>{result.path}</p>
-                   <p>{result.type}</p>
-                  </>
-                 )}
-                </Accordion>
-                </div>
-            }
-                settings
+                <button className='search_result_button'><img src={SearchResult} alt="SearchResult" />results</button>
+                <button className='settings_button'><img src={Settings} alt="Settings" />settings</button>
             </div>
     </div>
   )

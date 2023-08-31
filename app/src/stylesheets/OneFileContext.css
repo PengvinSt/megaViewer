@@ -44,9 +44,8 @@
     padding: 5px;
     border-radius: 5px;
 }
-.context_shortcut_container button {
-    width: 25px;
-    height: 25px;
+
+.context_shortcut_container button,.context_search_input_container button  {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -58,22 +57,42 @@
     padding: 5px;
     border-radius: 5px;
 }
+
+.context_shortcut_container button {
+    width: 25px;
+    height: 25px;
+}
+
+.context_search_input_container button img {
+    width: 22px;
+    height: 22px;
+}
+
+.context_search_input_container button {
+    width: 34px;
+    height: 34px;
+}
+
 .context_filename_container button img {
     width: 15px;
     height: 15px;
+    cursor: pointer;
 }
-.context_shortcut_container button img,.context_filename_container button img {
-    filter: var(--offlineExplorer-main-button-image-color-svg)
+
+.context_shortcut_container button img,.context_filename_container button img,.context_search_input_container button img, .context_buttons_container button img {
+    filter: var(--offlineExplorer-main-button-image-color-svg);
 }
-.context_shortcut_container button:hover img, .context_filename_container button:hover img {
+
+.context_shortcut_container button:hover img, .context_filename_container button:hover img,.context_search_input_container button:hover img,.context_buttons_container button:hover img {
     filter: var(--offlineExplorer-main-button-image-hover-color-svg);
 }
 
 .context_search_input_container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap:5px;
 }
+
 .context_search_input {
     border: transparent;
     border-bottom: 2px solid var(--window-main-border-color);
@@ -82,7 +101,7 @@
     /* border-radius: 5px; */
     padding: 5px;
     font-size: 16px;
-    width: 99%;
+    width: 100%;
     outline: none;
 }
 

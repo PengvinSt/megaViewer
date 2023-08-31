@@ -244,17 +244,21 @@ export default function FolderContentField() {
 
     const getStartingPath = async() =>{
         try {
-            const drive = await window.api.getStartingPath()
+            const {drive, startingPath} = await window.api.getStartingPath()
             setDrives([...drive])
             const path = []
             for(let i = 0; i < drive.length; i++){
                 drive[i].mountpoints.map(drive => path.push(drive))
             }
-            setFiles([])
-            setDirectory('')
-            setCurrentPath('')
-            setCoreDir([...path])
-            setPathState('')
+            if(startingPath !== undefined){
+                setPathState(startingPath)
+            }else{
+                setFiles([])
+                setDirectory('')
+                setCurrentPath('')
+                setCoreDir([...path])
+                setPathState('')
+            }
         } catch (error) {
             console.log(error)
         }
@@ -463,6 +467,9 @@ export default function FolderContentField() {
         if(pathState !== ''){
             if(pathState === 'Drive'){
                 getStartingPath()
+                setPathState('')
+            }else if(pathState === 'Reload'){
+                reloadFunc()
                 setPathState('')
             }else {
                 // console.log(pathState)

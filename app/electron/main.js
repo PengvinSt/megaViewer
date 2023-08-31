@@ -1,4 +1,4 @@
-const { app,screen, BrowserWindow, Menu, ipcMain, webContents } = require('electron'); 
+const { app,screen, BrowserWindow, Menu, ipcMain, webContents, shell } = require('electron'); 
 const { readdirSync } = require('fs');
 const path = require('path')
 
@@ -8,7 +8,8 @@ const drivelist = require('drivelist');
 
 
 const fs = require("fs")
-const {Worker} = require('worker_threads')
+const {Worker} = require('worker_threads');
+const { error } = require('console');
 
 
 if(!lock){
@@ -27,10 +28,7 @@ ipcMain.handle('getCurrentFilePath', ()=>{
 })
 // deprecated --------------------------------
 
-ipcMain.handle('getStartingPath', async ()=>{
-    const drives = await drivelist.list();
-    return drives
-})
+
 
 
 
@@ -118,91 +116,7 @@ ipcMain.handle('spawnPropertiesWindow', (_, mainData)=>{
 })
 
 
-const getFileStats = async (path) => {
-    try {
-        const stats = await fs.promises.stat(path);
-        return stats
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-ipcMain.handle('getFilesName', async (_, path)=>{
-    const fixedPath = `${path}\\`
-    let rawData = await fs.promises.readdir(fixedPath,{withFileTypes: true})
-    let files = rawData.map(file=>{
-        return {
-            name: file.name,
-            path:fixedPath + file.name,
-            type: file.isDirectory() ? "Folder" : "File",
-        }
-    })
-    // console.log(files.length)
-    return files
-})
-
-ipcMain.handle('getFilesFromPath', async (_, path)=>{
-    const fixedPath = `${path}\\`
-    let rawData = readdirSync(fixedPath,{withFileTypes: true})
-    const promiseResults = await Promise.allSettled(rawData.map(async (file) =>{
-        const Stats = await getFileStats(fixedPath + file.name)
-        if(file.isDirectory()){
-            const thisDirFiles = await fs.promises.readdir(fixedPath+file.name);
-            return {
-                name: file.name,
-                type: "Folder",
-                isEmpty:thisDirFiles.length > 0 ? false : true,
-                Stats
-            }
-        }else {
-            return {
-                name: file.name,
-                type: "File",
-                Stats
-            }
-        }
-        
-    }))
-    const results = []
-    const errors = []
-
-    promiseResults.forEach((result)=>{
-        if (result.status === 'fulfilled'){
-            results.push(result.value)
-            return
-        }
-        errors.push(result.reason)
-    })
-    // console.log(results)
-
-    return results
-})
-
-ipcMain.handle('getDiskSpace', async (_, path)=>{
-    if (process.platform == 'win32') { // Run wmic for Windows.
-        // const diskInfo = await checkDiskSpace(path)
-        const data = await fs.promises.statfs(path)
-        const diskInfo = {
-            diskPath:path.split(':')[0]+':',
-            free:data.bsize*data.bfree,
-            size:data.bsize*data.blocks
-        }
-        // console.log('Total free space',data.bsize*data.bfree);
-        // console.log('Available for user',data.bsize*data.blocks);
-        return diskInfo
-
-    } else if (process.platform == 'linux') { // Run df for Linux.
-        // in development
-    } else {
-        // in development
-    }
-})
-
-
-
-
-
-
+//temp redo
 ipcMain.handle('getMoreInfo', async(_,path)=> {
     const rawData = await fs.promises.stat(path)
     if(rawData.isDirectory()){
@@ -222,10 +136,11 @@ ipcMain.handle('getMoreInfo', async(_,path)=> {
         return data
     }
 })
+//temp redo
 
-const createMainWindow = () =>{
+const createMainWindow = (startData = {_uid:Date.now()+ Math.floor(Math.random() * 100)}) =>{
+
     let innerSettings = JSON.parse(fs.readFileSync(path.join(__dirname, '/innerSettings.json'),"utf8"))
-    console.log(innerSettings)
     const {width, height} = screen.getPrimaryDisplay().size
     let window = new BrowserWindow({
         backgroundColor:"#1C2321",
@@ -266,6 +181,102 @@ const createMainWindow = () =>{
         window.loadFile("app/dist/index.html");
     }
 
+    //FolderContentField
+    let isAlredyOpend = false
+    ipcMain.handle('getStartingPath', async ()=>{
+        if(startData.path !== undefined && !isAlredyOpend){
+            const drives = await drivelist.list();
+            return {drive:drives, startingPath:startData.path}
+        }else {
+            const drives = await drivelist.list();
+            return {drive:drives}
+        }
+        
+    })
+
+    ipcMain.handle('getDiskSpace', async (_, path)=>{
+        if (process.platform == 'win32') { // Run wmic for Windows.
+            // const diskInfo = await checkDiskSpace(path)
+            const data = await fs.promises.statfs(path)
+            const diskInfo = {
+                diskPath:path.split(':')[0]+':',
+                free:data.bsize*data.bfree,
+                size:data.bsize*data.blocks
+            }
+            // console.log('Total free space',data.bsize*data.bfree);
+            // console.log('Available for user',data.bsize*data.blocks);
+            return diskInfo
+    
+        } else if (process.platform == 'linux') { // Run df for Linux.
+            // in development
+        } else {
+            // in development
+        }
+    })
+
+    const getFileStats = async (path) => {
+        try {
+            const stats = await fs.promises.stat(path);
+            return stats
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    ipcMain.handle('getFilesFromPath', async (_, path)=>{
+        const fixedPath = `${path}\\`
+        let rawData = readdirSync(fixedPath,{withFileTypes: true})
+        const promiseResults = await Promise.allSettled(rawData.map(async (file) =>{
+            const Stats = await getFileStats(fixedPath + file.name)
+            if(file.isDirectory()){
+                const thisDirFiles = await fs.promises.readdir(fixedPath+file.name);
+                return {
+                    name: file.name,
+                    type: "Folder",
+                    isEmpty:thisDirFiles.length > 0 ? false : true,
+                    Stats
+                }
+            }else {
+                return {
+                    name: file.name,
+                    type: "File",
+                    Stats
+                }
+            }
+            
+        }))
+        const results = []
+        const errors = []
+    
+        promiseResults.forEach((result)=>{
+            if (result.status === 'fulfilled'){
+                results.push(result.value)
+                return
+            }
+            errors.push(result.reason)
+        })
+        // console.log(results)
+    
+        return results
+    })
+    //FolderContentField(end)
+
+    //Mod Acordion
+    ipcMain.handle('getFilesName', async (_, path)=>{
+        const fixedPath = `${path}\\`
+        let rawData = await fs.promises.readdir(fixedPath,{withFileTypes: true})
+        let files = rawData.map(file=>{
+            return {
+                name: file.name,
+                path:fixedPath + file.name,
+                type: file.isDirectory() ? "Folder" : "File",
+            }
+        })
+        // console.log(files.length)
+        return files
+    })
+    //Mod Acordion(end)
+
     ipcMain.handle('findFile', async (_, data) => {
         let allFindFiles = []
         const findFile = async (data) => {
@@ -297,6 +308,15 @@ const createMainWindow = () =>{
         
         return allFindFiles
     })
+
+    ipcMain.handle('moveFileToTrash', async (_, data)=>{
+        // console.log(data)
+        await shell.trashItem(data.path).catch((error)=>[
+            console.log(error)
+        ])
+        return 'Done!'
+    })
+
     ipcMain.on('stopFindFile', async (_, data) => {
         ipcMain.removeHandler('findFile')
     })
@@ -319,6 +339,37 @@ const createMainWindow = () =>{
         innerSettings.window.windowSize.height = size[1]
         fs.writeFileSync(path.join(__dirname, '/innerSettings.json'),JSON.stringify(innerSettings))
     })
+    ipcMain.on('copyDataToClipboard', (_, data)=>{
+        if (process.platform == 'win32') { // Run wmic for Windows.
+        require('child_process').exec(
+        `Set-Clipboard -PATH "${data.path}"`, { 'shell': 'powershell.exe' },
+        (err, stdout, stderr) => {
+            if (err){
+                console.log(err)
+                
+            }
+        }
+        );
+        } else if (process.platform == 'linux') { // Run df for Linux.
+            // in development
+        } else {
+            // require('child_process').exec(  
+            // `osascript -e 'set the clipboard to POSIX file "${data.path}"'`,
+
+            // function (err, stdout, stderr) {
+            //     console.log(stdout); // to confirm the application has been run
+            // }
+            // );
+        }
+    })
+    ipcMain.handle('renameData', (_, data)=>{
+        fs.renameSync(data.path, data.newpath)
+        return 'Done'
+    })
 }
 
 app.on('ready', createMainWindow)
+
+ipcMain.handle('openNewOfflineExplorerWindow', (_, startData) => {
+    createMainWindow(startData)
+})
